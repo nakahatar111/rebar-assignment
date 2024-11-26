@@ -1,0 +1,25 @@
+/* globals.css */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 97vh;
+}
+
+header {
+  padding: 10px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  background: #ffffff;
+}
+
+footer {
+  padding: 10px;
+  background: #f8f9fa;
+  border-top: 1px solid #ddd;
+  text-align: center;
+}
