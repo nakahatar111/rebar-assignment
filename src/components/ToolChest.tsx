@@ -110,7 +110,7 @@ const ToolChest = () => {
             )}
 
 
-<div>
+<div style={{height: addToolVisible ? "calc(100% - 125px - 20px)" : "calc(100% - 280px - 20px)"}}>
     <h4>Available Tools</h4>
     {tools.length === 0 ? (
         <p>No tools added yet.</p>
@@ -119,9 +119,8 @@ const ToolChest = () => {
             style={{
                 borderCollapse: "collapse", // Ensures borders collapse like in a traditional table
                 width: "100%", // Full width
-                height: addToolVisible
-                    ? "calc(100% - 200px - 20px)" // Shrink height if "Add Tool" is visible
-                    : "calc(100% - 50px - 20px)", // Default height when "Add Tool" is hidden
+                tableLayout: "fixed", // Distribute space evenly for all columns
+                height: "100%", // Default height when "Add Tool" is hidden
                 overflowY: "auto", // Enable vertical scrolling
                 border: "1px solid #ccc", // Table border
                 backgroundColor: "#f9f9f9", // Light background
@@ -141,7 +140,8 @@ const ToolChest = () => {
                         display: "table-cell",
                         textAlign: "center",
                         padding: "5px 10px",
-                        borderRight: "1px solid #ccc",
+                        border: "1px solid #ccc",
+                        width: "10%", // Fixed width for the icon column
                     }}
                 >
                     Icon
@@ -151,7 +151,7 @@ const ToolChest = () => {
                         display: "table-cell",
                         textAlign: "left",
                         padding: "5px 10px",
-                        borderRight: "1px solid #ccc",
+                        border: "1px solid #ccc",
                     }}
                 >
                     Name
@@ -160,6 +160,7 @@ const ToolChest = () => {
                     style={{
                         display: "table-cell",
                         textAlign: "left",
+                        border: "1px solid #ccc",
                         padding: "5px 10px",
                     }}
                 >
@@ -175,8 +176,45 @@ const ToolChest = () => {
                         key={index}
                         style={{
                             display: "table-row",
-                            border: "1px solid #ccc", // Row borders
+                            border: "1px solid #ccc",
                         }}
+                        draggable // Enable dragging
+                        onDragStart={(e) => {
+                            e.dataTransfer.setData(
+                                "tool",
+                                JSON.stringify({ ...tool, id: index }) // Pass tool info as drag data
+                            );
+                        
+                            // Create a custom drag image using an SVG element
+                            const svgNamespace = "http://www.w3.org/2000/svg";
+                            const svg = document.createElementNS(svgNamespace, "svg");
+                            svg.setAttribute("width", "40");
+                            svg.setAttribute("height", "40");
+                            svg.setAttribute("xmlns", svgNamespace);
+                            svg.style.position = "absolute"; // Ensure it's not visible as a floating element
+                            svg.style.top = "-1000px"; // Move it far off-screen
+                        
+                            // Create the shape based on the tool's shape
+                            const shape = document.createElementNS(svgNamespace, "path");
+                            shape.setAttribute(
+                                "d",
+                                tool.shape === "circle"
+                                    ? "M20 20 m -15, 0 a 15,15 0 1,0 30,0 a 15,15 0 1,0 -30,0" // Circle
+                                    : tool.shape === "square"
+                                    ? "M5 5 H35 V35 H5 Z" // Square
+                                    : tool.shape === "diamond"
+                                    ? "M20 5 L35 20 L20 35 L5 20 Z" // Diamond
+                                    : "M40 12.4 L17.2 40 L1.6 25.2 L6.4 21.2 L17.2 31.2 L35.2 6.4 Z" // Checkmark
+                            );
+                            shape.setAttribute("fill", tool.color);
+                            shape.setAttribute("opacity", "0.8");
+                            svg.appendChild(shape);
+                        
+                            document.body.appendChild(svg); // Temporarily add the SVG to the DOM
+                            e.dataTransfer.setDragImage(svg, 20, 20); // Center the drag image
+                            setTimeout(() => document.body.removeChild(svg), 0); // Clean up immediately
+                        }}
+                        
                     >
                         <div
                             style={{
@@ -229,6 +267,7 @@ const ToolChest = () => {
 
 // Function to return CSS clip-paths for predefined shapes
 const getClipPath = (shape: string): string => {
+    console.log(shape);
     switch (shape) {
         case "circle":
             return "circle(50% at 50% 50%)";

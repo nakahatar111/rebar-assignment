@@ -4,8 +4,9 @@ import React, { useRef, useEffect, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import "@react-pdf-viewer/core/lib/styles/index.css";
-import MarkupOverlay from "./MarkupOverlay";
+// import MarkupOverlay from "./MarkupOverlay";
 import ToolChest from "./ToolChest";
+import DraggableIconsLayer from "./DraggableIconsLayer";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 const PDFViewer = () => {
@@ -17,25 +18,50 @@ const PDFViewer = () => {
     const containerRef = useRef<HTMLDivElement>(null); // Reference to the scrollable container
     const canvasWrapperRef = useRef<HTMLDivElement>(null); // Reference to the canvas wrapper
     const renderTaskRef = useRef<any>(null);
-    const [isCtrlPressed, setIsCtrlPressed] = useState(false); // Track if Ctrl is pressed
+
     // Track dragging state
     const isDragging = useRef(false);
     const startPosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const scrollPosition = useRef<{ left: number; top: number }>({ left: 0, top: 0 });
-    const [pageDimensions, setPageDimensions] = useState<{ width: number; height: number } | null>(null);
     const [toolChestVisible, setToolChestVisible] = useState(true); // Track Tool Chest visibility
+
 
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault(); // Prevent default scrolling behavior
     
-            if (e.deltaY < 0) {
-                // Scrolling up, zoom in
-                setZoomLevel((prev) => Math.min(prev + 0.1, 5)); // Max zoom level: 5
-            } else {
-                // Scrolling down, zoom out
-                setZoomLevel((prev) => Math.max(prev - 0.1, 0.35)); // Min zoom level: 0.35
-            }
+            const container = containerRef.current;
+            if (!container) return;
+    
+            // Get the container's dimensions and current scroll positions
+            const rect = container.getBoundingClientRect();
+            const scrollLeft = container.scrollLeft;
+            const scrollTop = container.scrollTop;
+    
+            // Calculate the current mouse position relative to the container
+            const mouseX = e.clientX - rect.left + scrollLeft;
+            const mouseY = e.clientY - rect.top + scrollTop;
+    
+            // Current zoom level
+            const prevZoom = zoomLevel;
+    
+            // Update the zoom level
+            const newZoom = e.deltaY < 0
+                ? Math.min(prevZoom + 0.1, 5) // Zoom in (max zoom level: 5)
+                : Math.max(prevZoom - 0.1, 0.35); // Zoom out (min zoom level: 0.35)
+    
+            setZoomLevel(newZoom);
+    
+            // Calculate the scaling factor
+            const scaleFactor = newZoom / prevZoom;
+    
+            // Adjust the scroll position to zoom toward the mouse pointer
+            const newScrollLeft = mouseX * scaleFactor - (e.clientX - rect.left);
+            const newScrollTop = mouseY * scaleFactor - (e.clientY - rect.top);
+    
+            // Update the container's scroll position
+            container.scrollLeft = newScrollLeft;
+            container.scrollTop = newScrollTop;
         };
     
         const container = containerRef.current;
@@ -48,47 +74,8 @@ const PDFViewer = () => {
                 container.removeEventListener("wheel", handleWheel);
             }
         };
-    }, []);
+    }, [zoomLevel]);
     
-
-    // Ensure pageDimensions is set when the PDF is rendered
-    useEffect(() => {
-        const updatePageDimensions = () => {
-            if (canvasRef.current?.width && canvasRef.current?.height) {
-                setPageDimensions({
-                    width: canvasRef.current.width,
-                    height: canvasRef.current.height,
-                });
-            }
-        };
-    
-        updatePageDimensions(); // Update on initial render
-    
-        const observer = new ResizeObserver(() => updatePageDimensions());
-        if (canvasRef.current) observer.observe(canvasRef.current);
-    
-        return () => observer.disconnect();
-    }, [canvasRef, zoomLevel, currentPage]);
-    // Listen for Ctrl key press
-    useEffect(() => {
-    
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "Control") setIsCtrlPressed(true);
-        });
-    
-        window.addEventListener("keyup", (e) => {
-            if (e.key === "Control") setIsCtrlPressed(false);
-        });
-    
-        return () => {
-            window.removeEventListener("keydown", (e) => {
-                if (e.key === "Control") setIsCtrlPressed(true);
-            });
-            window.removeEventListener("keyup", (e) => {
-                if (e.key === "Control") setIsCtrlPressed(false);
-            });
-        };
-    }, []);
     
     // Load the PDF document
     useEffect(() => {
@@ -148,7 +135,6 @@ const PDFViewer = () => {
             wrapper.style.height = `${scaledHeight}px`;
             wrapper.style.marginTop = `${extraMarginTop}px`; // Dynamically computed top margin
             wrapper.style.marginLeft = `${extraMarginLeft}px`; // Dynamically computed left margin
-            console.log(scaledWidth, scaledHeight, extraMarginTop, extraMarginLeft);
             // Clear the canvas and reset transformations
             context.resetTransform();
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -172,6 +158,9 @@ const PDFViewer = () => {
                 } else {
                     console.error("An unknown error occurred:", err);
                 }
+            } finally {
+                // Clear the render task reference when done
+                renderTaskRef.current = null;
             }
         }
     };    
@@ -206,7 +195,7 @@ const PDFViewer = () => {
 
     // Mouse event handlers for drag scrolling
     const handleMouseDown = (e: React.MouseEvent) => {
-        if (!containerRef.current || !isCtrlPressed) return;
+        if (!containerRef.current) return;
 
         isDragging.current = true;
         startPosition.current = { x: e.clientX, y: e.clientY };
@@ -217,7 +206,7 @@ const PDFViewer = () => {
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        if (!isDragging.current || !containerRef.current|| !isCtrlPressed) return;
+        if (!isDragging.current || !containerRef.current) return;
 
         const deltaX = e.clientX - startPosition.current.x;
         const deltaY = e.clientY - startPosition.current.y;
@@ -231,7 +220,7 @@ const PDFViewer = () => {
     };
 
     return (
-        <div style={{height: "100%", width: "100%", border: "blue solid 4px"}}>
+        <div style={{height: "100%", width: "90vw", border: "blue solid 4px"}}>
             {/* Toolbar for zoom and page selection */}
             <div style={{textAlign: "center", height: "5%", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", }}>
                 <button onClick={() => handleZoomIn()}>
@@ -269,7 +258,7 @@ const PDFViewer = () => {
                 <div
                     ref={containerRef}
                     style={{
-                        flex: toolChestVisible ? 0.8 : 1, // Adjust width based on Tool Chest visibility
+                        flex: toolChestVisible ? 0.8 : 1,
                         overflow: "auto",
                         display: "flex",
                         justifyContent: "center",
@@ -281,17 +270,16 @@ const PDFViewer = () => {
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp} // Stop dragging if the mouse leaves the container
+                    onMouseLeave={handleMouseUp}
                 >
                     <div
                         ref={canvasWrapperRef}
                         style={{position: "relative"}}>
                         <canvas ref={canvasRef}></canvas>
-                        <MarkupOverlay
+                        <DraggableIconsLayer
                             zoomLevel={zoomLevel}
-                            pageDimensions={pageDimensions}
                             currentPage={currentPage}
-                            isPanning={isCtrlPressed}
+                            containerRef={canvasWrapperRef}
                         />
                     </div>
                 </div>

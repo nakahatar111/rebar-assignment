@@ -6,7 +6,7 @@ const PDFViewer = dynamic(() => import('@/components/PDFViewer'), { ssr: false }
 
 export default function Home() {
   return (
-    <div style={{ display: 'flex', height: '80vh', width: '90vw'}}>
+    <div style={{ display: 'flex', justifyContent: "center", alignItems: "center", height: '100%', width: '100vw'}}>
       <PDFViewer />
     </div>
   );
