@@ -5,12 +5,20 @@ import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 // import MarkupOverlay from "./MarkupOverlay";
+import { useSearchParams } from "next/navigation"; // App Router query parameter handling
+
 import ToolChest from "./ToolChest";
 import DraggableIconsLayer from "./DraggableIconsLayer";
+import InventoryList from "./InventoryList";
+// import ExportPDF from "./ExportPDF";
+import ExportPDFButton from "./ExportButton";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 const PDFViewer = () => {
     const [pdf, setPdf] = useState<any>(null);
+    const searchParams = useSearchParams(); // Call the hook
+    const pdfUrl = searchParams.get("pdfUrl"); // Now correctly retrieve "pdfUrl"
+    const [error, setError] = useState<string | null>(null); // Track PDF loading errors
     const [currentPage, setCurrentPage] = useState(1); // Default to the first page
     const [totalPages, setTotalPages] = useState(0);
     const [zoomLevel, setZoomLevel] = useState(0.35); // Default zoom level
@@ -18,13 +26,23 @@ const PDFViewer = () => {
     const containerRef = useRef<HTMLDivElement>(null); // Reference to the scrollable container
     const canvasWrapperRef = useRef<HTMLDivElement>(null); // Reference to the canvas wrapper
     const renderTaskRef = useRef<any>(null);
+    const [iconSize, setIconSize] = useState(20);
+    const [deleteTrigger, setDeleteTrigger] = useState(false); // Tracks delete button clicks
+    const [selectedIcons, setSelectedIcons] = useState<{ id: number; page: number }[]>([]);
+    const [editInputs, setEditInputs] = useState({ name: "", category: "" }); // Edit inputs
+    const [droppedIcons, setDroppedIcons] = useState<any[]>([]); // Manage dropped icons
 
     // Track dragging state
     const isDragging = useRef(false);
     const startPosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const scrollPosition = useRef<{ left: number; top: number }>({ left: 0, top: 0 });
     const [toolChestVisible, setToolChestVisible] = useState(true); // Track Tool Chest visibility
+    const [showTable, setShowTable] = useState(false);
 
+    
+    useEffect(() => {
+        console.log("selected icons: ", selectedIcons);
+    }, [selectedIcons]);
 
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
@@ -79,19 +97,41 @@ const PDFViewer = () => {
     
     // Load the PDF document
     useEffect(() => {
+        if (!pdfUrl) {
+            setError("No PDF URL provided. Please select a valid PDF.");
+            return;
+        }
+
         const loadPdf = async () => {
             try {
-                const loadedPdf = await pdfjsLib.getDocument("/blueprint.pdf").promise;
+                const loadedPdf = await pdfjsLib.getDocument(pdfUrl).promise;
                 console.log("PDF Loaded", loadedPdf);
                 setPdf(loadedPdf);
                 setTotalPages(loadedPdf.numPages); // Set the total number of pages
+                setError(null); // Clear any previous errors
             } catch (error) {
                 console.error("Error loading PDF:", error);
+                setError("Failed to load the PDF. Please try again or check the file.");
             }
         };
 
         loadPdf();
-    }, []);
+    }, [pdfUrl]);
+
+    // useEffect(() => {
+    //     const loadPdf = async () => {
+    //         try {
+    //             const loadedPdf = await pdfjsLib.getDocument("/blueprint.pdf").promise;
+    //             console.log("PDF Loaded", loadedPdf);
+    //             setPdf(loadedPdf);
+    //             setTotalPages(loadedPdf.numPages); // Set the total number of pages
+    //         } catch (error) {
+    //             console.error("Error loading PDF:", error);
+    //         }
+    //     };
+
+    //     loadPdf();
+    // }, []);
 
     // Render the current page with the current zoom level
 
@@ -191,10 +231,16 @@ const PDFViewer = () => {
     useEffect(() => {
         renderPage();
         handleResetZoom();
+        setSelectedIcons([]);
     }, [pdf, currentPage]);
 
     // Mouse event handlers for drag scrolling
     const handleMouseDown = (e: React.MouseEvent) => {
+        if ((e.target as HTMLElement).draggable) {
+            console.log("Dragging detected, skipping PDF panning");
+            return; // Exit to prevent panning logic
+        }
+
         if (!containerRef.current) return;
 
         isDragging.current = true;
@@ -219,8 +265,32 @@ const PDFViewer = () => {
         isDragging.current = false;
     };
 
+
+    if (error) {
+        return (
+            <div style={{ height: "95%", width: "90vw", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <div
+                    style={{
+                        padding: "20px",
+                        textAlign: "center",
+                        color: "red",
+                        backgroundColor: "#f8d7da",
+                        width: "30vw",
+                        borderRadius: "10px", // Rounded edges
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Subtle shadow
+                        border: "1px solid #f5c6cb", // Matching border color
+                    }}
+                >
+                    <h2 style={{ margin: "0", fontSize: "1.5rem" }}>Error</h2>
+                    <p style={{ margin: "10px 0 0", fontSize: "1rem" }}>{error}</p>
+                </div>
+            </div>
+        );
+    }
+    
+
     return (
-        <div style={{height: "100%", width: "90vw", border: "blue solid 4px"}}>
+        <div style={{height: "95%", width: "90vw", border: "blue solid 4px"}}>
             {/* Toolbar for zoom and page selection */}
             <div style={{textAlign: "center", height: "5%", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", }}>
                 <button onClick={() => handleZoomIn()}>
@@ -243,48 +313,96 @@ const PDFViewer = () => {
                     ))}
                 </select>
 
-                {/* Toggle Button */}
+                {/* Tool Chest Button */}
                 <button
                     onClick={() => setToolChestVisible(!toolChestVisible)}
                     style={{ backgroundColor: "#007bff",color: "#fff",cursor: "pointer"}} >
                     {toolChestVisible ? "Hide Tools" : "Show Tools"}
                 </button>
+                {/* Table Button */}
+                <button 
+                    onClick={() => setShowTable(!showTable)}
+                    style={{ backgroundColor: "#007bff",color: "#fff",cursor: "pointer"}}>
+                    {showTable ? 'Hide Table' : 'Show Table'}
+                </button>
+
+                {/* <ExportPDF
+                    pdfUrl="/blueprint.pdf"
+                    droppedIcons={droppedIcons}
+                /> */}
+                <ExportPDFButton pdfUrl="/blueprint.pdf" droppedIcons={droppedIcons} />
+
 
             </div>
             
 
             {/* Scrollable Viewer Area */}
             <div style={{display:'flex', flexDirection: "row", height: "95%", width: "100%",}}>
+                {/* Main Content Area */}
                 <div
-                    ref={containerRef}
                     style={{
                         flex: toolChestVisible ? 0.8 : 1,
                         overflow: "auto",
                         display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        border: "green solid 4px",
-                        cursor: isDragging.current ? "grabbing" : "grab",
-                        position: "relative", 
+                        flexDirection: "column",
+                        transition: "flex 0.3s ease", // Smooth resizing
+                        position: "relative",
                     }}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
                 >
                     <div
-                        ref={canvasWrapperRef}
-                        style={{position: "relative"}}>
-                        <canvas ref={canvasRef}></canvas>
-                        <DraggableIconsLayer
-                            zoomLevel={zoomLevel}
-                            currentPage={currentPage}
-                            containerRef={canvasWrapperRef}
-                        />
+                        ref={containerRef}
+                        style={{
+                            flex: showTable  ? 0.8 : 1,
+                            overflow: "auto",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            border: "green solid 4px",
+                            cursor: isDragging.current ? "grab" : "point",
+                            position: "relative", 
+                            transition: "flex 0.3s ease"
+                        }}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                    >
+                        <div
+                            ref={canvasWrapperRef}
+                            style={{position: "relative"}}>
+                            <canvas ref={canvasRef}></canvas>
+                            <DraggableIconsLayer
+                                zoomLevel={zoomLevel}
+                                currentPage={currentPage}
+                                containerRef={canvasWrapperRef}
+                                iconSize={iconSize}
+                                deleteTrigger={deleteTrigger} // Pass delete trigger to layer
+                                resetDeleteTrigger={() => setDeleteTrigger(false)} // Reset trigger
+                                selectedIcons={selectedIcons}
+                                setSelectedIcons={setSelectedIcons}
+                                editInputs={editInputs} // Pass edit inputs
+                                droppedIcons={droppedIcons} // Pass state
+                                setDroppedIcons={setDroppedIcons} // Pass state setter
+                            />
+                        </div>
                     </div>
+
+                    {/* Table Container */}
+                    {showTable && <InventoryList
+                        droppedIcons={droppedIcons}
+                        setDroppedIcons={setDroppedIcons}
+                        />
+                    }
                 </div>
                 {/* Tool Chest */}
-                {toolChestVisible && <ToolChest/>}
+                {toolChestVisible && <ToolChest
+                    setDeleteTrigger={setDeleteTrigger} // Pass delete trigger setter
+                    iconSize={iconSize}
+                    setIconSize={setIconSize}
+                    selectedIcons={selectedIcons} // Pass selected icons
+                    setEditInputs={setEditInputs} // Pass edit inputs setter
+                    />
+                }
             </div>
         </div>
     );

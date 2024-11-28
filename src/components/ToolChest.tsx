@@ -1,10 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const shapes = ["square", "circle", "diamond", "checkmark"];
 
-const ToolChest = () => {
+const ToolChest = ({
+        iconSize,
+        setIconSize,
+        setDeleteTrigger,
+        selectedIcons, // Pass selected icons from DraggableIconsLayer
+        setEditInputs,
+    }: {
+        iconSize: number;
+        setIconSize: (size: number) => void;
+        setDeleteTrigger: (trigger: boolean) => void;
+        selectedIcons: { id: number; page: number }[];
+        setEditInputs: React.Dispatch<React.SetStateAction<{ name: string; category: string }>>;
+    }) => {
     const [tools, setTools] = useState<any[]>([]); // Stores the list of tools
     const [newTool, setNewTool] = useState({
         name: "",
@@ -13,6 +25,17 @@ const ToolChest = () => {
         shape: "square", // Default shape
     });
     const [addToolVisible, setaddToolVisible] = useState(true); // Track Tool Chest visibility
+    const [showEditPopup, setShowEditPopup] = useState(false); // Edit popup visibility
+    const [localEditInputs, setLocalEditInputs] = useState({ name: "", category: "" }); // Temporary state
+
+    const handleEditConfirm = () => {
+        if (!localEditInputs.name && !localEditInputs.category) {
+            alert("Please enter a name or category.");
+            return;
+        }
+        setEditInputs(localEditInputs);
+        setLocalEditInputs({ name: "", category: "" }); // Clear local state
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -33,9 +56,85 @@ const ToolChest = () => {
         }));    
     };
 
+    useEffect(() => {
+        if (selectedIcons.length > 0) {
+            setShowEditPopup(true);
+        }
+        else{
+            setShowEditPopup(false);
+        }
+    }, [selectedIcons]);
+
     return (
-        <div style={{ flex: 0.2, backgroundColor: "#f0f0f0", width: "20%", padding: "10px", border: "1px solid gray", height:'calc(100%-20px)' }}>
+        <div style={{ flex: 0.2, backgroundColor: "#f0f0f0", width: "20%", padding: "10px", border: "1px solid gray", height:'calc(100%-20px)', transition: "flex 0.3s ease"}}>
             <h3>Tool Chest</h3>
+            {/* Slider for size */}
+            <div style={{ margin: "10px 0" }}>
+                <label htmlFor="icon-size-slider" style={{ display: "block" }}>
+                    Icon Size:
+                </label>
+                <input
+                    id="icon-size-slider"
+                    type="range"
+                    min="10"
+                    max="100"
+                    value={iconSize}
+                    onChange={(e) => setIconSize(Number(e.target.value))}
+                    style={{ width: "100%" }}
+                />
+                <p style={{ margin: "0", fontSize: "14px", textAlign: "center" }}>Size: {iconSize}px</p>
+            </div>
+
+            {/* Edit Popup */}
+            {showEditPopup && (
+                <div style={{ padding: "10px", border: "1px solid gray", backgroundColor: "#fff", marginTop: "10px" }}>
+                    <h4>Edit/Delete Selected Icons</h4>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="New Name"
+                        value={localEditInputs.name}
+                        onChange={(e) => setLocalEditInputs({ ...localEditInputs, name: e.target.value })}
+                        style={{ marginBottom: "5px", display: "block", width: "100%" }}
+                    />
+                    <input
+                        type="text"
+                        name="category"
+                        placeholder="New Category"
+                        value={localEditInputs.category}
+                        onChange={(e) => setLocalEditInputs({ ...localEditInputs, category: e.target.value })}
+                        style={{ marginBottom: "5px", display: "block", width: "100%" }}
+                    />
+                    <button
+                        onClick={handleEditConfirm}
+                        style={{
+                            backgroundColor: "#007bff",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "5px",
+                            padding: "5px 10px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Confirm
+                    </button>
+                    {/* Delete Button */}
+                    <button
+                        onClick={() => setDeleteTrigger(true)} // Trigger delete
+                        style={{
+                            backgroundColor: "#007bff",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "5px",
+                            padding: "5px 10px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Delete
+                    </button>
+                </div>
+            )}
+
             <button
                 onClick={() => setaddToolVisible(!addToolVisible)}
                 style={{ backgroundColor: "#007bff",color: "#fff",cursor: "pointer"}} >
@@ -110,7 +209,7 @@ const ToolChest = () => {
             )}
 
 
-<div style={{height: addToolVisible ? "calc(100% - 125px - 20px)" : "calc(100% - 280px - 20px)"}}>
+<div style={{height: addToolVisible ? "calc(100% - 225px - 20px)" : "calc(100% - 380px - 20px)"}}>
     <h4>Available Tools</h4>
     {tools.length === 0 ? (
         <p>No tools added yet.</p>
@@ -182,7 +281,7 @@ const ToolChest = () => {
                         onDragStart={(e) => {
                             e.dataTransfer.setData(
                                 "tool",
-                                JSON.stringify({ ...tool, id: index }) // Pass tool info as drag data
+                                JSON.stringify({ ...tool, id: index, size: iconSize }) // Pass tool info as drag data
                             );
                         
                             // Create a custom drag image using an SVG element
@@ -207,7 +306,7 @@ const ToolChest = () => {
                                     : "M40 12.4 L17.2 40 L1.6 25.2 L6.4 21.2 L17.2 31.2 L35.2 6.4 Z" // Checkmark
                             );
                             shape.setAttribute("fill", tool.color);
-                            shape.setAttribute("opacity", "0.8");
+                            shape.setAttribute("opacity", "0.5");
                             svg.appendChild(shape);
                         
                             document.body.appendChild(svg); // Temporarily add the SVG to the DOM
@@ -227,8 +326,8 @@ const ToolChest = () => {
                             <span
                                 style={{
                                     display: "inline-block",
-                                    width: "20px",
-                                    height: "20px",
+                                    width: '20px',
+                                    height: '20px',
                                     backgroundColor: tool.color,
                                     opacity: 0.5, // See-through effect
                                     clipPath: getClipPath(tool.shape),
@@ -267,7 +366,6 @@ const ToolChest = () => {
 
 // Function to return CSS clip-paths for predefined shapes
 const getClipPath = (shape: string): string => {
-    console.log(shape);
     switch (shape) {
         case "circle":
             return "circle(50% at 50% 50%)";
