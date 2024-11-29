@@ -16,7 +16,7 @@ const ToolChest = ({
         iconSize: number;
         setIconSize: (size: number) => void;
         setDeleteTrigger: (trigger: boolean) => void;
-        selectedIcons: { id: number; page: number }[];
+        selectedIcons: { id: string; page: number }[];
         setEditInputs: React.Dispatch<React.SetStateAction<{ name: string; category: string }>>;
         tools: any[]; // Replace `any` with a defined type for better safety
         setTools: React.Dispatch<React.SetStateAction<any[]>>; // Replace `any[]` with the defined type

@@ -1,13 +1,14 @@
 "use client";
 
-import dynamic from 'next/dynamic';
-
-const PDFViewer = dynamic(() => import('@/components/PDFViewer'), { ssr: false });
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Home() {
-  return (
-    <div style={{ display: 'flex', justifyContent: "center", alignItems: "center", height: '100%', width: '100vw'}}>
-      <PDFViewer />
-    </div>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/login');
+  }, [router]);
+
+  return null; // No UI needed as we are redirecting
 }

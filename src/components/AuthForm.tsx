@@ -79,9 +79,14 @@ export default function AuthForm() {
 
       setSuccessMessage('Sign-up successful! Please check your email for the verification link');
       console.log('Sign-up success:', response);
-    } catch (err: any) {
-      setError(err.message || 'Error during sign-up. Please try again.');
-      console.error('Sign-up error:', err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Error during sign-up. Please try again.');
+        console.error('Sign-up error:', err);
+      } else {
+        setError('Error during sign-up. Please try again.');
+        console.error('Sign-up error:', err);
+      }
     }
   };
 
@@ -95,9 +100,14 @@ export default function AuthForm() {
       setSuccessMessage('Sign-in successful!');
       console.log('Sign-in success:', user);
       router.push('/upload');
-    } catch (err: any) {
-      setError(err.message || 'Error during sign-in. Please check your credentials.');
-      console.error('Sign-in error:', err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Error during sign-in. Please check your credentials.');
+        console.error('Sign-in error:', err);
+      } else {
+        setError('Error during sign-in. Please check your credentials.');
+        console.error('Sign-in error:', err);
+      }
     }
   };
 

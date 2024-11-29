@@ -56,7 +56,7 @@ const PDFViewer = () => {
     const renderTaskRef = useRef<any>(null);
     const [iconSize, setIconSize] = useState(20);
     const [deleteTrigger, setDeleteTrigger] = useState(false); // Tracks delete button clicks
-    const [selectedIcons, setSelectedIcons] = useState<{ id: number; page: number }[]>([]);
+    const [selectedIcons, setSelectedIcons] = useState<{ id: string; page: number }[]>([]);
     const [editInputs, setEditInputs] = useState({ name: "", category: "" }); // Edit inputs
     const [droppedIcons, setDroppedIcons] = useState<DroppedIcon[]>([]); // Manage the list of dropped icons
     const [tools, setTools] = useState<Tool[]>([]); // Manage the list of tools

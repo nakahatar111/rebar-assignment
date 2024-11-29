@@ -1,5 +1,17 @@
 import React, { useState, useEffect, ReactNode  } from "react";
 
+type DroppedIcon = {
+    category: string;
+    color: string;
+    id: string;
+    name: string;
+    page: number; 
+    shape: string;
+    size: number;
+    x: number;
+    y: number;
+};
+
 const DraggableIconsLayer = ({
     zoomLevel,
     currentPage,
@@ -19,11 +31,11 @@ const DraggableIconsLayer = ({
     iconSize: number;
     deleteTrigger: boolean;
     resetDeleteTrigger: () => void;
-    selectedIcons: { id: number; page: number }[];
-    setSelectedIcons: React.Dispatch<React.SetStateAction<{ id: number; page: number }[]>>;    
+    selectedIcons: { id: string; page: number }[];
+    setSelectedIcons: React.Dispatch<React.SetStateAction<{ id: string; page: number }[]>>;    
     editInputs: { name: string; category: string };
-    droppedIcons: any[];
-    setDroppedIcons: React.Dispatch<React.SetStateAction<any[]>>;
+    droppedIcons: DroppedIcon[];
+    setDroppedIcons: React.Dispatch<React.SetStateAction<DroppedIcon[]>>;
 }) => {
     // const [droppedIcons, setDroppedIcons] = useState<any[]>([]);
     const [draggingIndex, setDraggingIndex] = useState<number | null>(null); // Track the index of the dragging icon
@@ -107,7 +119,6 @@ const DraggableIconsLayer = ({
         // Create a custom drag image using an SVG element
         const svgNamespace = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(svgNamespace, "svg");
-        const size = draggedIcon.size * zoomLevel; // Scale the size
         svg.setAttribute("width", "40");
         svg.setAttribute("height", "40");
         svg.setAttribute("xmlns", svgNamespace);
@@ -141,7 +152,7 @@ const DraggableIconsLayer = ({
         e.stopPropagation(); // Prevent the event from propagating
     };
 
-    const toggleSelectIcon = (id: number) => {
+    const toggleSelectIcon = (id: string) => {
         setSelectedIcons((prev) =>
             prev.some((icon) => icon.id === id && icon.page === currentPage)
                 ? prev.filter((icon) => !(icon.id === id && icon.page === currentPage)) // Deselect if already selected
@@ -183,7 +194,6 @@ const DraggableIconsLayer = ({
             )
         );
     };
-    
 
     useEffect(() => {
         // Update icons when edit is triggered
@@ -191,22 +201,6 @@ const DraggableIconsLayer = ({
             handleEditSelectedIcons();
         }
     }, [editInputs]);
-
-    // const handleResize = (index: number, newSize: number) => {
-    //     setDroppedIcons((prev) =>
-    //         prev.map((icon, i) =>
-    //             i === index ? { ...icon, size: newSize } : icon
-    //         )
-    //     );
-    // };
-
-    const handleRearrange = (index: number, newX: number, newY: number) => {
-        setDroppedIcons((prev) =>
-            prev.map((icon, i) =>
-                i === index ? { ...icon, x: newX, y: newY } : icon
-            )
-        );
-    };
 
     return (
         <div
