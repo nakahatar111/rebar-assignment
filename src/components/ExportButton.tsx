@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { exportPDF } from "./ExportPDF";
 
 const ExportPDFButton = ({

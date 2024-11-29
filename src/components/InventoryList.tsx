@@ -1,23 +1,24 @@
-import React from "react";
+import {Dispatch, SetStateAction, FC} from "react";
 
-interface DroppedIcon {
-    id: string;
-    name: string;
+type DroppedIcon = {
     category: string;
-    page: number;
+    color: string;
+    id: number;
+    name: string;
+    page: number; 
     shape: string;
     size: number;
     x: number;
     y: number;
-    color: string;
-}
+};
+
 
 interface InventoryListProps {
     droppedIcons: DroppedIcon[]; // Array of dropped icons
-    setDroppedIcons: React.Dispatch<React.SetStateAction<DroppedIcon[]>>; // Setter for dropped icons
+    setDroppedIcons: Dispatch<SetStateAction<DroppedIcon[]>>; // Setter for dropped icons
 }
 
-const InventoryList: React.FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }) => {
+const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }) => {
     // Group icons by name and category
     const groupedIcons = droppedIcons.reduce((acc: Record<string, { count: number; category: string; shape: string; color: string }>, icon) => {
         const key = `${icon.name}-${icon.category}`;

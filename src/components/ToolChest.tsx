@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction, Dispatch, ChangeEvent} from "react";
 
 const shapes = ["square", "circle", "diamond", "checkmark"];
 
@@ -16,10 +16,10 @@ const ToolChest = ({
         iconSize: number;
         setIconSize: (size: number) => void;
         setDeleteTrigger: (trigger: boolean) => void;
-        selectedIcons: { id: string; page: number }[];
-        setEditInputs: React.Dispatch<React.SetStateAction<{ name: string; category: string }>>;
+        selectedIcons: { id: number; page: number }[];
+        setEditInputs: Dispatch<SetStateAction<{ name: string; category: string }>>;
         tools: any[]; // Replace `any` with a defined type for better safety
-        setTools: React.Dispatch<React.SetStateAction<any[]>>; // Replace `any[]` with the defined type
+        setTools: Dispatch<SetStateAction<any[]>>; // Replace `any[]` with the defined type
     }) => {
     // move this to pdfviewer
     const [newTool, setNewTool] = useState({
@@ -41,7 +41,7 @@ const ToolChest = ({
         setLocalEditInputs({ name: "", category: "" }); // Clear local state
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setNewTool((prev) => ({ ...prev, [name]: value }));
     };

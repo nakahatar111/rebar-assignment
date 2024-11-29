@@ -1,9 +1,9 @@
-import React, { useState, useEffect, ReactNode  } from "react";
+import { useState, useEffect, ReactNode, RefObject, SetStateAction, Dispatch, DragEvent  } from "react";
 
 type DroppedIcon = {
     category: string;
     color: string;
-    id: string;
+    id: number;
     name: string;
     page: number; 
     shape: string;
@@ -27,15 +27,15 @@ const DraggableIconsLayer = ({
 }: {
     zoomLevel: number;
     currentPage: number;
-    containerRef: React.RefObject<HTMLDivElement>;
+    containerRef: RefObject<HTMLDivElement>;
     iconSize: number;
     deleteTrigger: boolean;
     resetDeleteTrigger: () => void;
-    selectedIcons: { id: string; page: number }[];
-    setSelectedIcons: React.Dispatch<React.SetStateAction<{ id: string; page: number }[]>>;    
+    selectedIcons: { id: number; page: number }[];
+    setSelectedIcons: Dispatch<SetStateAction<{ id: number; page: number }[]>>;    
     editInputs: { name: string; category: string };
     droppedIcons: DroppedIcon[];
-    setDroppedIcons: React.Dispatch<React.SetStateAction<DroppedIcon[]>>;
+    setDroppedIcons: Dispatch<SetStateAction<DroppedIcon[]>>;
 }) => {
     // const [droppedIcons, setDroppedIcons] = useState<any[]>([]);
     const [draggingIndex, setDraggingIndex] = useState<number | null>(null); // Track the index of the dragging icon
@@ -51,9 +51,14 @@ const DraggableIconsLayer = ({
         y: 0,
         content: "",
     });
+    
     useEffect(() => {
         console.log(droppedIcons);
     }, [droppedIcons]);
+
+    useEffect(() => {
+        console.log("dragging index:", draggingIndex);
+    }, [draggingIndex]);
     // Handle Delete Trigger
     
     useEffect(() => {
@@ -72,7 +77,7 @@ const DraggableIconsLayer = ({
     
 
 
-    const handleDrop = (e: React.DragEvent) => {
+    const handleDrop = (e: DragEvent) => {
         e.preventDefault(); // Allow drop
         e.stopPropagation(); // Prevent the event from propagating to the PDF viewer
     
@@ -83,11 +88,10 @@ const DraggableIconsLayer = ({
         const y = (e.clientY - rect.top) / zoomLevel;
     
         if (draggingIndex !== null) {
+            console.log("Dropping");
             // Rearrange existing icon
             setDroppedIcons((prev) =>
-                prev.map((icon, index) =>
-                    index === draggingIndex ? { ...icon, x, y } : icon // Update position
-                )
+                prev.map((icon) => icon.id === draggingIndex ? { ...icon, x, y } : icon)
             );
             setDraggingIndex(null); // Reset dragging index
         } else {
@@ -110,12 +114,15 @@ const DraggableIconsLayer = ({
     };
     
     
-    const handleDragStart = (e: React.DragEvent, index: number) => {
+    const handleDragStart = (e: DragEvent, id: number) => {
         e.stopPropagation();
-        setDraggingIndex(index); // Store the index of the dragging icon
-    
-        const draggedIcon = droppedIcons[index]; // Get the dragged icon details
-    
+        setDraggingIndex(id); // Store the index of the dragging icon
+        const draggedIcon = droppedIcons.find(icon => icon.id === id);
+        if(!draggedIcon){
+            console.log("undefined icon");
+            return
+        }
+
         // Create a custom drag image using an SVG element
         const svgNamespace = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(svgNamespace, "svg");
@@ -147,12 +154,12 @@ const DraggableIconsLayer = ({
     };
     
 
-    const handleDragOver = (e: React.DragEvent) => {
+    const handleDragOver = (e: DragEvent) => {
         e.preventDefault();
         e.stopPropagation(); // Prevent the event from propagating
     };
 
-    const toggleSelectIcon = (id: string) => {
+    const toggleSelectIcon = (id: number) => {
         setSelectedIcons((prev) =>
             prev.some((icon) => icon.id === id && icon.page === currentPage)
                 ? prev.filter((icon) => !(icon.id === id && icon.page === currentPage)) // Deselect if already selected
@@ -237,7 +244,7 @@ const DraggableIconsLayer = ({
                         }}
                         draggable
                         onClick={() => toggleSelectIcon(icon.id)} // Toggle selection
-                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragStart={(e) => handleDragStart(e, icon.id)}
                         onMouseEnter={(e) => {
                             const rect = e.currentTarget.getBoundingClientRect();
                             setTooltip({

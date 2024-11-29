@@ -5,12 +5,12 @@ import { Amplify } from 'aws-amplify';
 import awsconfig from '../aws-exports'; // Ensure this path is correct
 import { signOut } from 'aws-amplify/auth';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import { ReactNode } from 'react';
 
 Amplify.configure(awsconfig);
 
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const handleSignOut = async () => {

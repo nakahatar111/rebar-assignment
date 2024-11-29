@@ -1,18 +1,13 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
-// import * as pdfjsLib from "pdfjs-dist";
-// import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
+import { useRef, useEffect, useState, MouseEvent } from "react";
 import "@react-pdf-viewer/core/lib/styles/index.css";
-// import MarkupOverlay from "./MarkupOverlay";
 import { useSearchParams } from "next/navigation"; // App Router query parameter handling
 
 import ToolChest from "./ToolChest";
 import DraggableIconsLayer from "./DraggableIconsLayer";
 import InventoryList from "./InventoryList";
-// import ExportPDF from "./ExportPDF";
 import ExportPDFButton from "./ExportButton";
-// pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 // Lazy load PDF.js to reduce the bundle size
 const loadPdfjs = async () => {
@@ -33,7 +28,7 @@ type Tool = {
 type DroppedIcon = {
     category: string;
     color: string;
-    id: string; // Unique ID for each icon
+    id: number; // Unique ID for each icon
     name: string;
     page: number; // Page number where the icon is placed
     shape: string;
@@ -63,7 +58,7 @@ const PDFViewer = () => {
     const renderTaskRef = useRef<any>(null);
     const [iconSize, setIconSize] = useState(20);
     const [deleteTrigger, setDeleteTrigger] = useState(false); // Tracks delete button clicks
-    const [selectedIcons, setSelectedIcons] = useState<{ id: string; page: number }[]>([]);
+    const [selectedIcons, setSelectedIcons] = useState<{ id: number; page: number }[]>([]);
     const [editInputs, setEditInputs] = useState({ name: "", category: "" }); // Edit inputs
     const [droppedIcons, setDroppedIcons] = useState<DroppedIcon[]>([]); // Manage the list of dropped icons
     const [tools, setTools] = useState<Tool[]>([]); // Manage the list of tools
@@ -333,7 +328,7 @@ const PDFViewer = () => {
     }, [pdf, currentPage]);
 
     // Mouse event handlers for drag scrolling
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => {
         if ((e.target as HTMLElement).draggable) {
             console.log("Dragging detected, skipping PDF panning");
             return; // Exit to prevent panning logic
@@ -349,7 +344,7 @@ const PDFViewer = () => {
         };
     };
 
-    const handleMouseMove = (e: React.MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent) => {
         if (!isDragging.current || !containerRef.current) return;
 
         const deltaX = e.clientX - startPosition.current.x;

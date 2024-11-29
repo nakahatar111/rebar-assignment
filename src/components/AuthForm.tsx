@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
 import { SignUpInput, SignUpOutput, signUp, signIn, getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 import awsconfig from '../aws-exports';
