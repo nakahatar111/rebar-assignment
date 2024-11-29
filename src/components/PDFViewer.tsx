@@ -78,7 +78,8 @@ const PDFViewer = () => {
     useEffect(() => {
         console.log("Tool Chest: ", tools);
         console.log("Overlay: ", droppedIcons);
-    }, [tools, droppedIcons]);
+        console.log("selectedIcons:", selectedIcons);
+    }, [tools, droppedIcons,selectedIcons]);
 
     // Fetch project state from the backend
     const fetchProjectState = async () => {
