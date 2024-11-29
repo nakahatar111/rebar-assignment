@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import * as pdfjsLib from "pdfjs-dist";
-import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
+// import * as pdfjsLib from "pdfjs-dist";
+// import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 // import MarkupOverlay from "./MarkupOverlay";
 import { useSearchParams } from "next/navigation"; // App Router query parameter handling
@@ -12,7 +12,14 @@ import DraggableIconsLayer from "./DraggableIconsLayer";
 import InventoryList from "./InventoryList";
 // import ExportPDF from "./ExportPDF";
 import ExportPDFButton from "./ExportButton";
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+// pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+// Lazy load PDF.js to reduce the bundle size
+const loadPdfjs = async () => {
+    const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf"); // Legacy build ensures compatibility
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.js"; // Use worker from public directory
+    return pdfjsLib;
+};
 
 
 type Tool = {
@@ -207,6 +214,7 @@ const PDFViewer = () => {
         console.log("PDF Link:", pdfUrl);
         const loadPdf = async () => {
             try {
+                const pdfjsLib = await loadPdfjs();
                 const loadedPdf = await pdfjsLib.getDocument(pdfUrl).promise;
                 console.log("PDF Loaded", loadedPdf);
                 setPdf(loadedPdf);
