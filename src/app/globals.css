@@ -4,12 +4,13 @@ body {
   flex-direction: column;
   height: 100vh;
   margin:0px;
+  background: #F2F2F2;
 }
 
 header {
   height: 4vh;
   padding: 10px;
-  background: #f8f9fa;
+  background: #b3b3b3;
   border-bottom: 1px solid #ddd;
 }
 
@@ -17,7 +18,7 @@ main {
   height: 85vh;
   flex: 1;
   display: flex;
-  background: #ffffff;
+  background: #F2F2F2;
 }
 
 footer {

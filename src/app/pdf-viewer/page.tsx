@@ -29,7 +29,7 @@ const PDFViewerPage = () => {
   }, [router]);
 
   if (loading) {
-    return <p>Loading...</p>; // Display a loading message or spinner while checking authentication
+    return <p style={{marginLeft:'auto', marginRight:'auto', fontFamily: 'Arial, sans-serif' }}>Loading...</p>;
   }
   else{
     return <PDFViewer />;

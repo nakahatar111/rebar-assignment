@@ -51,15 +51,7 @@ const DraggableIconsLayer = ({
         y: 0,
         content: "",
     });
-    
-    useEffect(() => {
-        console.log(droppedIcons);
-    }, [droppedIcons]);
 
-    useEffect(() => {
-        console.log("dragging index:", draggingIndex);
-    }, [draggingIndex]);
-    // Handle Delete Trigger
     
     useEffect(() => {
         if (deleteTrigger) {
@@ -88,7 +80,6 @@ const DraggableIconsLayer = ({
         const y = (e.clientY - rect.top) / zoomLevel;
     
         if (draggingIndex !== null) {
-            console.log("Dropping");
             // Rearrange existing icon
             setDroppedIcons((prev) =>
                 prev.map((icon) => icon.id === draggingIndex ? { ...icon, x, y } : icon)

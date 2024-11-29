@@ -30,10 +30,14 @@ const UploadPage = () => {
   }, [router]);
 
   if (loading) {
-    return <p>Loading...</p>; // Display a loading message or spinner while checking authentication
+    return <p style={{marginLeft:'auto', marginRight:'auto', fontFamily: 'Arial, sans-serif' }}>Loading...</p>;
   }
   else{
-    return <PDFUploadPage />;
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh', width:'100vw' }}>
+      <PDFUploadPage />
+    </div>
+    
+    
   }
 };
 

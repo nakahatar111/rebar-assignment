@@ -237,111 +237,175 @@ const PDFUploadPage = () => {
     };
 
     return (
-        <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-            <h1>Manage PDFs</h1>
-            {/* Select Organization */}
-            <div style={{ marginBottom: "20px" }}>
-                <h2>Choose Target</h2>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            backgroundColor: "#f4f4f4",
+            padding: "20px",
+            maxHeight: "70vh",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              backgroundColor: "#ffffff",
+              borderRadius: "15px",
+              padding: "20px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <h1 style={{ fontSize: "24px", textAlign: "center", marginBottom: "20px" }}>Upload Project</h1>
+    
+            <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                <label style={{ fontWeight: "bold", flex: "0 0 150px" }}>Choose Target</label>
                 <select
                     value={selectedOrgId || ""}
                     onChange={(e) => setSelectedOrgId(e.target.value || null)}
-                    style={{ padding: "5px", width: "300px" }}
+                    style={{
+                    flex: "1",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    border: "1px solid #ddd",
+                    }}
                 >
                     <option value="">Personal</option>
-                    {organizations.map((org, index) => (
-                        <option key={`${org.name}-${index}`} value={org.name}>
-                            {org.name}
-                        </option>
+                    {organizations.map((org) => (
+                    <option key={org.id} value={org.id}>
+                        {org.name}
+                    </option>
                     ))}
                 </select>
             </div>
 
-            {/* File Upload */}
-            <div style={{ marginBottom: "20px" }}>
-                <h2>Upload Files</h2>
+            <div style={{ marginBottom: "30px", display: "flex", alignItems: "center", gap: "10px" }}>
+                <label style={{ fontWeight: "bold", flex: "0 0 150px" }}>Upload PDF</label>
                 <input
                     type="file"
                     accept="application/pdf"
                     multiple
                     onChange={handleFileUpload}
+                    style={{
+                    flex: "1",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    border: "1px solid #ddd",
+                    }}
                 />
             </div>
 
+    
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "20px",
+              }}
+            >
             {/* Personal Files */}
-            <div style={{ marginBottom: "20px" }}>
-                <h2>Personal Files</h2>
-                {personalFiles.length > 0 ? (
-                    <ul style={{ listStyleType: "none", padding: "0" }}>
-                        {personalFiles.map((file, index) => (
-                            <li
-                                key={`personal-${file.name}-${index}`}
-                                style={{
-                                    cursor: "pointer",
-                                    padding: "10px",
-                                    border: "1px solid #ddd",
-                                    marginBottom: "5px",
-                                    borderRadius: "4px",
-                                }}
-                                onClick={() => handlePDFSelect(file.url, file.id)}
-                            >
-                                {file.name}
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No personal files uploaded yet.</p>
-                )}
-            </div>
-
-            {/* Organization Files */}
-            <div>
-                <h2>Organizations</h2>
-                         {/* Create Organization */}
-                <div style={{ marginBottom: "20px" }}>
-                     <input
-                        type="text"
-                        placeholder="Enter organization name"
-                        value={newOrgName}
-                        onChange={(e) => setNewOrgName(e.target.value)}
-                        style={{
-                            padding: "5px",
-                            marginRight: "10px",
-                            width: "300px",
-                        }}
-                    />
-                    <button onClick={handleCreateOrganization} style={{ padding: "5px 10px" }}>
-                        Create/Join Organization
-                    </button>
+            <div
+            style={{
+                flex: 1,
+                backgroundColor: "#f9f9f9",
+                borderRadius: "10px",
+                padding: "20px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                maxHeight: "400px", // Set the maximum height
+                overflowY: "auto", // Enable scrolling when content exceeds max height
+            }}
+            >
+            <h2 style={{ fontSize: "20px", marginBottom: "10px" }}>Personal Files</h2>
+            {personalFiles.length > 0 ? (
+                personalFiles.map((file, index) => (
+                <div
+                    key={file.id}
+                    style={{
+                    padding: "9px",
+                    borderTop: index === 0 ? "1px solid #999999" : "none",
+                    borderBottom: "#999999 solid 1px",
+                    cursor: "pointer",
+                    }}
+                    onClick={() => handlePDFSelect(file.url, file.id)}
+                >
+                    {file.name}
                 </div>
-                {organizations.map((org) => (
-                    <div key={org.name} style={{ marginBottom: "20px" }}>
-                        <h3>{org.name}</h3>
-                        {org.pdfs.length > 0 ? (
-                            <ul style={{ listStyleType: "none", padding: "0" }}>
-                                {org.pdfs.map((file, index) => (
-                                    <li
-                                        key={`${org.name}-${file.name}-${index}`}
-                                        style={{
-                                            cursor: "pointer",
-                                            padding: "10px",
-                                            border: "1px solid #ddd",
-                                            marginBottom: "5px",
-                                            borderRadius: "4px",
-                                        }}
-                                        onClick={() => handlePDFSelect(file.url, file.id)}
-                                    >
-                                        {file.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>No files uploaded for this organization yet.</p>
-                        )}
-                    </div>
-                ))}
+                ))
+            ) : (
+                <p>No personal files uploaded yet.</p>
+            )}
             </div>
-        </div>
-    );
-};
+              {/* Organizations */}
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: "10px",
+                  padding: "20px",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  maxHeight: "400px", // Set maximum height
+                  overflowY: "auto", // Enable scrolling when content exceeds max height
+                }}
+              >
+            <h2 style={{ fontSize: "20px", marginBottom: "10px" }}>Organization</h2>
+            <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                <input
+                    type="text"
+                    placeholder="Enter Organization Name"
+                    value={newOrgName}
+                    onChange={(e) => setNewOrgName(e.target.value)}
+                    style={{
+                    flex: "1", // Allow the input to take the remaining space
+                    padding: "10px",
+                    borderRadius: "10px",
+                    border: "1px solid #ddd",
+                    }}
+                />
+                <button
+                    onClick={handleCreateOrganization}
+                    style={{
+                    padding: "10px 20px", // Adjust padding for better button size
+                    borderRadius: "10px",
+                    border: "1px solid #379EA9",
+                    backgroundColor: "#379EA9",
+                    color: "#fff",
+                    cursor: "pointer",
+                    flexShrink: 0, // Prevent the button from shrinking
+                    }}
+                >
+                    Create/Join
+                </button>
+                </div>
 
-export default PDFUploadPage;
+                {organizations.map((org) => (
+                  <div key={org.id}>
+                    <h3 style={{ fontSize: "18px", marginBottom: "10px" }}>{org.name}</h3>
+                    {org.pdfs.length > 0 ? (
+                      org.pdfs.map((file, index) => (
+                        <div
+                          key={file.id}
+                          style={{
+                            padding: "9px",
+                            borderTop: index === 0 ? "1px solid #999999" : "none",
+                            borderBottom: "#999999 solid 1px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handlePDFSelect(file.url, file.id)}
+                        >
+                          {file.name}
+                        </div>
+                      ))
+                    ) : (
+                      <p>No files uploaded for this organization yet.</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+    
+    export default PDFUploadPage;

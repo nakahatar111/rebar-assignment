@@ -22,7 +22,18 @@ const ExportPDFButton = ({
     };
 
     return (
-        <button onClick={handleExport} disabled={isDownloading}>
+        <button onClick={handleExport} disabled={isDownloading}
+            style={{
+                padding: "5px 15px",
+                borderRadius: "20px",
+                border: "1px solid #007bff",
+                backgroundColor: "#dbe9f9",
+                color: "#007bff",
+                cursor: "pointer",
+                fontWeight: "bold",
+                width:'140px'
+            }}
+          >
             {isDownloading ? "Downloading..." : "Download PDF"}
         </button>
     );

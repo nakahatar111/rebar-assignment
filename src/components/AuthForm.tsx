@@ -56,7 +56,7 @@ export default function AuthForm() {
   
       console.log('DynamoDB user entry created successfully');
     } catch (err) {
-      console.error('Error creating user entry in DynamoDB:', err);
+      console.log('Error creating user entry in DynamoDB:', err);
     }
   };
   
@@ -82,10 +82,10 @@ export default function AuthForm() {
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || 'Error during sign-up. Please try again.');
-        console.error('Sign-up error:', err);
+        console.log('Sign-up error:', err);
       } else {
         setError('Error during sign-up. Please try again.');
-        console.error('Sign-up error:', err);
+        console.log('Sign-up error:', err);
       }
     }
   };
@@ -103,63 +103,101 @@ export default function AuthForm() {
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || 'Error during sign-in. Please check your credentials.');
-        console.error('Sign-in error:', err);
+        console.log('Sign-in error:', err);
       } else {
         setError('Error during sign-in. Please check your credentials.');
-        console.error('Sign-in error:', err);
+        console.log('Sign-in error:', err);
       }
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
-      <h2>Authentication</h2>
-      {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
-      {successMessage && <p style={{ color: 'green', marginBottom: '10px' }}>{successMessage}</p>}
-      <input
-        type="text"
-        placeholder="Email or Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        style={{ marginBottom: '10px', width: '100%', padding: '8px', fontSize: '16px' }}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ marginBottom: '10px', width: '100%', padding: '8px', fontSize: '16px' }}
-      />
-      <div style={{ marginBottom: '20px' }}>
-        <button
-          onClick={handleSignUp}
-          style={{
-            marginRight: '10px',
-            padding: '10px 20px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            backgroundColor: '#007BFF',
-            color: '#FFF',
-            border: 'none',
-            borderRadius: '5px',
-          }}
-        >
-          Sign Up
-        </button>
-        <button
-          onClick={handleSignIn}
-          style={{
-            padding: '10px 20px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            backgroundColor: '#28A745',
-            color: '#FFF',
-            border: 'none',
-            borderRadius: '5px',
-          }}
-        >
-          Sign In
-        </button>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f4f4f4',
+        marginLeft:'auto',
+        marginRight:'auto'
+      }}
+    >
+      <div
+        style={{
+          width: '350px',
+          padding: '30px',
+          backgroundColor: '#fff',
+          borderRadius: '15px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          textAlign: 'center',
+        }}
+      >
+        <h2 style={{ fontSize: '24px', marginBottom: '20px', fontFamily: 'Arial, sans-serif' }}>Login</h2>
+        {error && <p style={{ color: 'red', marginBottom: '10px' , fontFamily: 'Arial, sans-serif' }}>{error}</p>}
+        {successMessage && <p style={{ color: 'green', marginBottom: '10px' , fontFamily: 'Arial, sans-serif' }}>{successMessage}</p>}
+        <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '10px', fontSize:'20px', fontFamily: 'Arial, sans-serif' }}>Email</label>
+          <input
+            type="text"
+            placeholder="Enter Email"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px',
+              borderRadius: '20px',
+              border: '1px solid #ddd',
+              marginBottom: '20px',
+              fontSize: '16px',
+            }}
+          />
+          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '10px', fontSize:'20px', fontFamily: 'Arial, sans-serif'}}>Password</label>
+          <input
+            type="password"
+            placeholder="Enter Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px',
+              borderRadius: '20px',
+              border: '1px solid #ddd',
+              marginBottom: '20px',
+              fontSize: '16px',
+            }}
+          />
+        </div>
+        <div>
+          <button
+            onClick={handleSignUp}
+            style={{
+              marginRight: '10px',
+              padding: '10px 20px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              backgroundColor: '#55A4FF',
+              color: '#FFF',
+              border: 'none',
+              borderRadius: '20px',
+            }}
+          >
+            Sign Up
+          </button>
+          <button
+            onClick={handleSignIn}
+            style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              backgroundColor: '#28A745',
+              color: '#FFF',
+              border: 'none',
+              borderRadius: '20px',
+            }}
+          >
+            Sign In
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -47,9 +47,8 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
     return (
         <div
             style={{
-                flex: 0.2, // Reserve 20% height for the table
-                backgroundColor: "#ccc",
-                borderTop: "2px solid #888",
+                flex: 0.4, // Reserve 20% height for the table
+                backgroundColor: "#F1F1F1",
                 overflow: "auto",
                 padding: "10px",
                 boxSizing: "border-box",
@@ -58,8 +57,8 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
                 width: "100%",
             }}
         >
-            <h3 style={{ margin: "0 0 10px 0", textAlign: "center" }}>Inventory List</h3>
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+            <h3 style={{ margin: "0 0 10px 0", textAlign: "center", fontFamily: 'Arial, sans-serif'}}>Inventory List</h3>
+            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontFamily: 'Arial, sans-serif' }}>
                 <thead>
                     <tr>
                         <th style={{ borderBottom: "2px solid #444", padding: "5px" }}>Icon</th>
@@ -99,11 +98,13 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
                                     <button
                                         onClick={() => handleRemoveItem(item.name, item.category)}
                                         style={{
-                                            backgroundColor: "#ff4d4d",
+                                            backgroundColor: "#FF6F61",
                                             color: "#fff",
                                             border: "none",
                                             padding: "5px 10px",
                                             cursor: "pointer",
+                                            borderRadius: "20px",
+
                                         }}
                                     >
                                         Remove

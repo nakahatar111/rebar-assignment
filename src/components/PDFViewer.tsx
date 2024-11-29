@@ -71,16 +71,10 @@ const PDFViewer = () => {
     const [toolChestVisible, setToolChestVisible] = useState(true); // Track Tool Chest visibility
     const [showTable, setShowTable] = useState(false);
 
-    useEffect(() => {
-        console.log("Tool Chest: ", tools);
-        console.log("Overlay: ", droppedIcons);
-        console.log("selectedIcons:", selectedIcons);
-    }, [tools, droppedIcons,selectedIcons]);
-
     // Fetch project state from the backend
     const fetchProjectState = async () => {
         if (!projectId) {
-            console.error("Project ID not found.");
+            console.log("Project ID not found.");
             return;
         }
 
@@ -101,13 +95,12 @@ const PDFViewer = () => {
             }
 
             const data: { tools?: Tool[]; overlay?: DroppedIcon[] } = await response.json();
-            console.log("Fetched Project State:", data);
 
             // Update the state with fetched data, or leave as is if no data is returned
             if (data.tools) setTools(data.tools);
             if (data.overlay) setDroppedIcons(data.overlay);
         } catch (error) {
-            console.error("Error fetching project state:", error);
+            console.log("Error fetching project state:", error);
         }
     };
 
@@ -119,7 +112,7 @@ const PDFViewer = () => {
 
     const handleSaveState = async () => {
         if (!projectId) {
-            console.error("Project ID not found.");
+            console.log("Project ID not found.");
             return;
         }
     
@@ -146,7 +139,7 @@ const PDFViewer = () => {
             const data = await response.json();
             console.log("State saved to DynamoDB:", data);
         } catch (error) {
-            console.error("Error saving state to DynamoDB:", error);
+            console.log("Error saving state to DynamoDB:", error);
         }
     };
     
@@ -208,17 +201,15 @@ const PDFViewer = () => {
             setError("No PDF URL provided. Please select a valid PDF.");
             return;
         }
-        console.log("PDF Link:", pdfUrl);
         const loadPdf = async () => {
             try {
                 const pdfjsLib = await loadPdfjs();
                 const loadedPdf = await pdfjsLib.getDocument(pdfUrl).promise;
-                console.log("PDF Loaded", loadedPdf);
                 setPdf(loadedPdf);
                 setTotalPages(loadedPdf.numPages); // Set the total number of pages
                 setError(null); // Clear any previous errors
             } catch (error) {
-                console.error("Error loading PDF:", error);
+                console.log("Error loading PDF:", error);
                 setError("Failed to load the PDF. Please try again or check the file.");
             }
         };
@@ -288,9 +279,9 @@ const PDFViewer = () => {
                 if (err instanceof Error && err.name === "RenderingCancelledException") {
                     console.log("Rendering cancelled");
                 } else if (err instanceof Error) {
-                    console.error("Error rendering page:", err.message);
+                    console.log("Error rendering page:", err.message);
                 } else {
-                    console.error("An unknown error occurred:", err);
+                    console.log("An unknown error occurred:", err);
                 }
             } finally {
                 // Clear the render task reference when done
@@ -384,54 +375,153 @@ const PDFViewer = () => {
     
 
     return (
-        <div style={{height: "95%", width: "90vw", border: "blue solid 4px", marginLeft:'auto', marginRight:'auto'}}>
+        <div style={{height: "95%", width: "90vw", marginLeft:'auto', marginRight:'auto', background:'#FFF', borderRadius: '30px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'}}>
             {/* Toolbar for zoom and page selection */}
-            <div style={{textAlign: "center", height: "5%", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", }}>
-                <button onClick={() => handleZoomIn()}>
-                    Zoom In
-                </button>
-                <button onClick={() => handleZoomOut()}>
-                    Zoom Out
-                </button>
-                <button onClick={() => handleResetZoom()}>Reset</button>
+            <div
+            style={{
+                textAlign: "center",
+                height: "6%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                backgroundColor:'#E9F6F8',
+                width:'70%',
+                marginLeft:'auto',
+                marginRight:'auto',
+                borderRadius: '40px'
+            }}
+            >
+            {/* Page Selection */}
+            <select
+                value={currentPage}
+                onChange={(e) => setCurrentPage(Number(e.target.value))}
+                style={{
+                padding: "5px 10px",
+                borderRadius: "20px",
+                border: "1px solid #379EA9",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                color:'#379EA9',
+                width:'100px'
+                }}
+            >
+                {Array.from({ length: totalPages }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                    Page {i + 1}
+                </option>
+                ))}
+            </select>
 
-                <select
-                    value={currentPage}
-                    onChange={(e) => setCurrentPage(Number(e.target.value))}
-                    style={{ padding: "5px" }}
-                >
-                    {Array.from({ length: totalPages }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                            Page {i + 1}
-                        </option>
-                    ))}
-                </select>
+            {/* Open Tool */}
+            <button
+                onClick={() => setToolChestVisible(!toolChestVisible)}
+                style={{
+                padding: "5px 15px",
+                borderRadius: "20px",
+                border: "1px solid #379EA9",
+                backgroundColor: toolChestVisible ? "#379EA9" : "transparent",
+                color: toolChestVisible ? "#fff" : "#379EA9",
+                cursor: "pointer",
+                fontWeight: "bold",
+                width:'100px'
+                }}
+            >
+                Open Tool
+            </button>
 
-                {/* Tool Chest Button */}
-                <button
-                    onClick={() => setToolChestVisible(!toolChestVisible)}
-                    style={{ backgroundColor: "#007bff",color: "#fff",cursor: "pointer"}} >
-                    {toolChestVisible ? "Hide Tools" : "Show Tools"}
-                </button>
-                {/* Table Button */}
-                <button 
-                    onClick={() => setShowTable(!showTable)}
-                    style={{ backgroundColor: "#007bff",color: "#fff",cursor: "pointer"}}>
-                    {showTable ? 'Hide Table' : 'Show Table'}
-                </button>
+            {/* Open Inventory */}
+            <button
+                onClick={() => setShowTable(!showTable)}
+                style={{
+                padding: "5px 15px",
+                borderRadius: "20px",
+                border: "1px solid #379EA9",
+                backgroundColor: showTable ? "#379EA9" : "transparent",
+                color: showTable ? "#fff" : "#379EA9",
+                cursor: "pointer",
+                fontWeight: "bold",
+                marginRight:'50px',
+                width:'130px'
 
-                <ExportPDFButton pdfUrl={pdfUrlString} droppedIcons={droppedIcons} />
+                }}
+            >
+                Open Inventory
+            </button>
 
-                <button onClick={handleSaveState} style={{ backgroundColor: "#28a745", color: "#fff", cursor: "pointer" }}>
-                    Save State
-                </button>
+            {/* Zoom In */}
+            <button
+                onClick={() => handleZoomIn()}
+                style={{
+                padding: "5px 15px",
+                borderRadius: "20px",
+                border: "1px solid #5e5d5d",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                width:'100px'
 
+                }}
+            >
+                Zoom In
+            </button>
 
+            {/* Zoom Out */}
+            <button
+                onClick={() => handleZoomOut()}
+                style={{
+                padding: "5px 15px",
+                borderRadius: "20px",
+                border: "1px solid #5e5d5d",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                width:'100px'
+
+                }}
+            >
+                Zoom Out
+            </button>
+
+            {/* Reset */}
+            <button
+                onClick={() => handleResetZoom()}
+                style={{
+                padding: "5px 15px",
+                borderRadius: "20px",
+                border: "1px solid #5e5d5d",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                marginRight:'50px',
+                width:'70px'
+
+                }}
+            >
+                Reset
+            </button>
+
+            {/* Download */}
+            <ExportPDFButton pdfUrl={pdfUrlString} droppedIcons={droppedIcons}/>
+            {/* Save */}
+            <button
+                onClick={handleSaveState}
+                style={{
+                padding: "5px 15px",
+                borderRadius: "20px",
+                border: "1px solid #28a745",
+                backgroundColor: "#c9f6cd",
+                color: "#28a745",
+                cursor: "pointer",
+                fontWeight: "bold",
+                width:'60px'
+                }}
+            >
+                Save
+            </button>
             </div>
+
             
 
             {/* Scrollable Viewer Area */}
-            <div style={{display:'flex', flexDirection: "row", height: "95%", width: "100%",}}>
+            <div style={{display:'flex', flexDirection: "row", height: "94%", width: "100%",}}>
                 {/* Main Content Area */}
                 <div
                     style={{
@@ -446,12 +536,12 @@ const PDFViewer = () => {
                     <div
                         ref={containerRef}
                         style={{
-                            flex: showTable  ? 0.8 : 1,
+                            flex: showTable  ? 0.6 : 1,
                             overflow: "auto",
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
-                            border: "green solid 4px",
+                            border: "solid 1px #ccc",
                             cursor: isDragging.current ? "grab" : "point",
                             position: "relative", 
                             transition: "flex 0.3s ease"

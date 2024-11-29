@@ -70,165 +70,372 @@ const ToolChest = ({
     }, [selectedIcons]);
 
     return (
-        <div style={{ flex: 0.2, backgroundColor: "#f0f0f0", width: "20%", padding: "10px", border: "1px solid gray", height:'calc(100%-20px)', transition: "flex 0.3s ease"}}>
-            <h3>Tool Chest</h3>
-            {/* Slider for size */}
-            <div style={{ margin: "10px 0" }}>
-                <label htmlFor="icon-size-slider" style={{ display: "block" }}>
-                    Icon Size:
-                </label>
-                <input
-                    id="icon-size-slider"
-                    type="range"
-                    min="10"
-                    max="100"
-                    value={iconSize}
-                    onChange={(e) => setIconSize(Number(e.target.value))}
-                    style={{ width: "100%" }}
-                />
-                <p style={{ margin: "0", fontSize: "14px", textAlign: "center" }}>Size: {iconSize}px</p>
-            </div>
+        <div style={{ flex: 0.2, backgroundColor: "#E7E7E7", width: "20%", padding: "10px", transition: "flex 0.3s ease", borderRadius: "30px",
+            display: "flex", // Use flexbox
+            flexDirection: "column", // Stack items vertically
+            height: 'calc(100%-20px)', // Take up the full height of the parent
+        }}>
+            <h3 style={{ fontFamily: "Arial, sans-serif", textAlign: "center", marginTop:'10px', marginBottom:'10px'}}>Tool Chest</h3>
+            
 
             {/* Edit Popup */}
             {showEditPopup && (
-                <div style={{ padding: "10px", border: "1px solid gray", backgroundColor: "#fff", marginTop: "10px" }}>
-                    <h4>Edit/Delete Selected Icons</h4>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="New Name"
-                        value={localEditInputs.name}
-                        onChange={(e) => setLocalEditInputs({ ...localEditInputs, name: e.target.value })}
-                        style={{ marginBottom: "5px", display: "block", width: "100%" }}
-                    />
-                    <input
-                        type="text"
-                        name="category"
-                        placeholder="New Category"
-                        value={localEditInputs.category}
-                        onChange={(e) => setLocalEditInputs({ ...localEditInputs, category: e.target.value })}
-                        style={{ marginBottom: "5px", display: "block", width: "100%" }}
-                    />
-                    <button
-                        onClick={handleEditConfirm}
-                        style={{
-                            backgroundColor: "#007bff",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "5px",
-                            padding: "5px 10px",
-                            cursor: "pointer",
-                        }}
+                <div
+                style={{
+                  padding: "10px",
+                  paddingLeft:"20px",
+                  borderRadius: "10px",
+                  backgroundColor: "#f4f4f4",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  margin: "20px auto",
+                  height:"20%",
+                  width:"100%"
+                }}
+              >
+                <h4
+                  style={{
+                    fontFamily: "Arial, sans-serif",
+                    fontSize: "15px",
+                    margin: "0 0 15px 0",
+                    textAlign: "center",
+                  }}
+                >
+                  Edit/Delete Selected Icons
+                </h4>
+              
+                {/* Input fields */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "5px",
+                  }}
+                >
+                  {/* Name Field */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center", // Vertically center the label and input
+                      gap: "10px", // Space between the label and input
+                    }}
+                  >
+                    <label
+                      style={{
+                        fontFamily: "Arial, sans-serif",
+                        fontSize: "14px",
+                        minWidth: "80px",
+                        fontWeight: "bold",
+                        color:'#4A4A4A'
+                      }}
                     >
-                        Confirm
-                    </button>
-                    {/* Delete Button */}
-                    <button
-                        onClick={() => setDeleteTrigger(true)} // Trigger delete
-                        style={{
-                            backgroundColor: "#007bff",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "5px",
-                            padding: "5px 10px",
-                            cursor: "pointer",
-                        }}
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Enter New Name"
+                      value={localEditInputs.name}
+                      onChange={(e) =>
+                        setLocalEditInputs({ ...localEditInputs, name: e.target.value })
+                      }
+                      style={{
+                        flex: 1, // Takes up the remaining space
+                        padding: "5px",
+                        borderRadius: "20px",
+                        border: "1px solid #ddd",
+                        backgroundColor: "#fff",
+                        fontSize: "14px",
+                        paddingLeft:'10px',
+                      }}
+                    />
+                  </div>
+              
+                  {/* Category Field */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    <label
+                      style={{
+                        fontFamily: "Arial, sans-serif",
+                        fontSize: "14px",
+                        minWidth: "80px",
+                        fontWeight: "bold",
+                        color:'#4A4A4A'
+                      }}
                     >
-                        Delete
-                    </button>
+                      Category
+                    </label>
+                    <input
+                      type="text"
+                      name="category"
+                      placeholder="Enter New Category"
+                      value={localEditInputs.category}
+                      onChange={(e) =>
+                        setLocalEditInputs({
+                          ...localEditInputs,
+                          category: e.target.value,
+                        })
+                      }
+                      style={{
+                        flex: 1,
+                        padding: "5px",
+                        borderRadius: "20px",
+                        border: "1px solid #ddd",
+                        backgroundColor: "#fff",
+                        fontSize: "14px",
+                        paddingLeft:'10px',
+                      }}
+                    />
+                  </div>
                 </div>
+              
+                {/* Buttons */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-around",
+                    marginTop: "8px",
+                  }}
+                >
+                  <button
+                    onClick={handleEditConfirm}
+                    style={{
+                      backgroundColor: "#569AFF",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "8px 20px",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                    }}
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    onClick={() => setDeleteTrigger(true)}
+                    style={{
+                      backgroundColor: "#FF6F61",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "10px 20px",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+              
             )}
 
             <button
                 onClick={() => setaddToolVisible(!addToolVisible)}
-                style={{ backgroundColor: "#007bff",color: "#fff",cursor: "pointer"}} >
+                style={{
+                    backgroundColor: "#569AFF",
+                    color: "#fff",
+                    cursor: "pointer",
+                    border: "none",
+                    padding: "8px 20px",
+                    borderRadius: "20px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    width:'120px'
+                }}
+            >
                 {addToolVisible ? "Add Tools" : "Hide Menu"}
             </button>
             {!addToolVisible && (
-                <div style={{ marginBottom: "10px", border: "green solid 2px", padding: "10px", height:"130px"}}>
-                    <div
+            <div
+                style={{
+                marginTop: "2px",
+                padding: "10px",
+                paddingLeft:'20px',
+                backgroundColor: "#F0F0F0",
+                borderRadius: "15px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                height:"24%"
+                }}
+            >
+                <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 2fr",
+                    rowGap: "5px",
+                    columnGap: "15px",
+                    alignItems: "center",
+                }}
+                >
+                    {/* First Column - Labels */}
+                    <label style={{ fontWeight: "bold", fontSize: "14px", fontFamily: 'Arial, sans-serif', color:'#4A4A4A'}}>Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Enter Tool Name"
+                        value={newTool.name}
+                        onChange={handleInputChange}
                         style={{
-                            display: "grid",
-                            gridTemplateColumns: "40% 55%", // Set the widths for the columns
-                            rowGap: "5px",
-                            columnGap: "10px",
+                        padding: "5px",
+                        paddingLeft:'10px',
+                        border: "1px solid #ccc",
+                        borderRadius: "20px",
+                        fontSize: "14px",
+                        width:'80%'
+                        }}
+                    />
+
+                    <label style={{ fontWeight: "bold", fontSize: "14px", fontFamily: 'Arial, sans-serif', color:'#4A4A4A' }}>Category</label>
+                    <input
+                        type="text"
+                        name="category"
+                        placeholder="Enter Category"
+                        value={newTool.category}
+                        onChange={handleInputChange}
+                        style={{
+                        padding: "5px",
+                        paddingLeft:'10px',
+                        border: "1px solid #ccc",
+                        borderRadius: "20px",
+                        fontSize: "14px",
+                        width:'80%'
+                        }}
+                    />
+
+                    <label style={{ fontWeight: "bold", fontSize: "14px", fontFamily: 'Arial, sans-serif', color:'#4A4A4A' }}>Shape</label>
+                    <select
+                        name="shape"
+                        value={newTool.shape}
+                        onChange={handleInputChange}
+                        style={{
+                        padding: "5px",
+                        border: "1px solid #ccc",
+                        borderRadius: "20px",
+                        fontSize: "14px",
+                        width:'90%'
                         }}
                     >
-                        {/* First Column - Labels */}
-                        <label>Name:</label>
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Tool Name"
-                            value={newTool.name}
-                            onChange={handleInputChange}
-                        />
+                        {shapes.map((shape) => (
+                        <option key={shape} value={shape}>
+                            {shape.charAt(0).toUpperCase() + shape.slice(1)}
+                        </option>
+                        ))}
+                    </select>
 
-                        <label>Category:</label>
-                        <input
-                            type="text"
-                            name="category"
-                            placeholder="Category"
-                            value={newTool.category}
-                            onChange={handleInputChange}
-                        />
-
-                        <label>Color:</label>
-                        <input
-                            type="color"
-                            name="color"
-                            value={newTool.color}
-                            onChange={handleInputChange}
-                            style={{ width: "100%", height: "100%", padding: "0", margin: "0" }}
-                        />
-
-                        <label>Shape:</label>
-                        <select
-                            name="shape"
-                            value={newTool.shape}
-                            onChange={handleInputChange}
-                            style={{ width: "100%" }}
-                        >
-                            {shapes.map((shape) => (
-                                <option key={shape} value={shape}>
-                                    {shape.charAt(0).toUpperCase() + shape.slice(1)}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <label style={{ fontWeight: "bold", fontSize: "14px", fontFamily: 'Arial, sans-serif', color:'#4A4A4A' }}>Color</label>
+                    <input
+                        type="color"
+                        name="color"
+                        value={newTool.color}
+                        onChange={handleInputChange}
+                        style={{
+                        padding: "3px",
+                        border: "none",
+                        height: "33px",
+                        width:'90%'
+                        }}
+                    />
+                </div>
+                <div style={{ textAlign: "center" }}>
                     <button
                         onClick={handleAddTool}
                         style={{
-                            marginTop: "10px",
-                            padding: "5px 10px",
-                            backgroundColor: "#007bff",
-                            color: "white",
+                            marginTop: "0px",
+                            padding: "8px 20px",
+                            backgroundColor: "#569AFF",
+                            color: "#fff",
                             border: "none",
+                            borderRadius: "20px",
+                            fontWeight: "bold",
                             cursor: "pointer",
+                            width: "100px",
+                            textAlign: "center",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                         }}
                     >
-                        Add Tool
+                    Add Tool
                     </button>
                 </div>
+
+            </div>
             )}
 
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center", // Aligns the left and right sections vertically
+                        justifyContent: "space-between", // Distributes "Available Tools" and the slider section
+                        margin: "6px 0",
+                    }}
+                    >
+                    {/* Left side: Title */}
+                    <h4
+                        style={{
+                        fontFamily: "Arial, sans-serif",
+                        margin: "0",
+                        fontSize: "16px",
+                        }}
+                    >
+                        Available Tools
+                    </h4>
 
-<div style={{height: addToolVisible ? "calc(100% - 225px - 20px)" : "calc(100% - 380px - 20px)"}}>
-    <h4>Available Tools</h4>
-    {tools.length === 0 ? (
-        <p>No tools added yet.</p>
-    ) : (
-        <div
-            style={{
-                borderCollapse: "collapse", // Ensures borders collapse like in a traditional table
-                width: "100%", // Full width
-                tableLayout: "fixed", // Distribute space evenly for all columns
-                height: "100%", // Default height when "Add Tool" is hidden
-                overflowY: "auto", // Enable vertical scrolling
-                border: "1px solid #ccc", // Table border
-                backgroundColor: "#f9f9f9", // Light background
-            }}
-        >
+                    {/* Right side: Slider and Label */}
+                    <div
+                        style={{
+                        display: "flex",
+                        flexDirection: "column", // Stacks the text and slider vertically
+                        alignItems: "center", // Centers both text and slider horizontally
+                        width: "50%", // Adjust the width of the right section
+                        }}
+                    >
+                        <label
+                        htmlFor="icon-size-slider"
+                        style={{
+                            fontFamily: "Arial, sans-serif",
+                            fontSize: "14px",
+                            marginBottom: "0px", // Adds space between text and slider
+                        }}
+                        >
+                        Icon Size: {iconSize}px
+                        </label>
+                        <input
+                        id="icon-size-slider"
+                        type="range"
+                        min="10"
+                        max="200"
+                        value={iconSize}
+                        onChange={(e) => setIconSize(Number(e.target.value))}
+                        style={{
+                            width: "100%", // Makes the slider stretch to fit the container
+                            cursor: "pointer",
+                            accentColor: "#569AFF", // Matches the color of the design
+                        }}
+                        />
+                    </div>
+                </div>
+                <div style={{ flexGrow: 0.80, overflowY: "auto", overflowX: "hidden", marginTop: "10px" }}>
+
+                {tools.length === 0 ? (
+                    <p>No tools added yet.</p>
+                ) : (
+                    <div
+                        style={{
+                            borderCollapse: "collapse", // Ensures borders collapse like in a traditional table
+                            width: "100%", // Full width
+                            tableLayout: "fixed", // Distribute space evenly for all columns
+                            // height: "100%", // Default height when "Add Tool" is hidden
+                            overflowY: "auto", // Enable vertical scrolling
+                            border: "1px solid #ccc", // Table border
+                            backgroundColor: "#f9f9f9", // Light background
+                        }}
+                    >
             {/* Header Row */}
             <div
                 style={{
@@ -245,6 +452,7 @@ const ToolChest = ({
                         padding: "5px 10px",
                         border: "1px solid #ccc",
                         width: "10%", // Fixed width for the icon column
+                        fontFamily: 'Arial, sans-serif'
                     }}
                 >
                     Icon
@@ -255,6 +463,7 @@ const ToolChest = ({
                         textAlign: "left",
                         padding: "5px 10px",
                         border: "1px solid #ccc",
+                        fontFamily: 'Arial, sans-serif'
                     }}
                 >
                     Name
@@ -265,6 +474,7 @@ const ToolChest = ({
                         textAlign: "left",
                         border: "1px solid #ccc",
                         padding: "5px 10px",
+                        fontFamily: 'Arial, sans-serif'
                     }}
                 >
                     Category
@@ -280,6 +490,7 @@ const ToolChest = ({
                         style={{
                             display: "table-row",
                             border: "1px solid #ccc",
+                            fontFamily: 'Arial, sans-serif'
                         }}
                         draggable // Enable dragging
                         onDragStart={(e) => {
