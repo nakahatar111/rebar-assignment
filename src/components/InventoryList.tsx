@@ -81,7 +81,8 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
                                             height: "20px",
                                             backgroundColor: item.color,
                                             opacity: 0.5,
-                                            borderRadius: item.shape === "circle" ? "50%" : "0",
+                                            clipPath: getClipPath(item.shape), // Shape-specific clip path
+                                            // borderRadius: item.shape === "circle" ? "50%" : "0",
                                         }}
                                     />
                                 </td>
@@ -121,6 +122,21 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
             </table>
         </div>
     );
+};
+
+const getClipPath = (shape: string): string => {
+    switch (shape) {
+        case "circle":
+            return "circle(50% at 50% 50%)";
+        case "square":
+            return "none";
+        case "diamond":
+            return "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)";
+        case "checkmark":
+            return "polygon(100% 31%, 43% 100%, 4% 63%, 16% 53%, 43% 78%, 88% 22%)";
+        default:
+            return "none";
+    }
 };
 
 export default InventoryList;
