@@ -47,6 +47,7 @@ const PDFViewer = () => {
     const [pdf, setPdf] = useState<any>(null);
     const searchParams = useSearchParams(); // Call the hook
     const pdfUrl = searchParams.get("pdfUrl"); // Now correctly retrieve "pdfUrl"
+    const pdfUrlString = pdfUrl || ""; // Default to an empty string if null
     const projectId = searchParams.get("projectId");
     const [error, setError] = useState<string | null>(null); // Track PDF loading errors
     const [currentPage, setCurrentPage] = useState(1); // Default to the first page
@@ -419,7 +420,7 @@ const PDFViewer = () => {
                     {showTable ? 'Hide Table' : 'Show Table'}
                 </button>
 
-                <ExportPDFButton pdfUrl="/blueprint.pdf" droppedIcons={droppedIcons} />
+                <ExportPDFButton pdfUrl={pdfUrlString} droppedIcons={droppedIcons} />
 
                 <button onClick={handleSaveState} style={{ backgroundColor: "#28a745", color: "#fff", cursor: "pointer" }}>
                     Save State

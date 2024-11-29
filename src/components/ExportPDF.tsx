@@ -96,12 +96,6 @@ export const exportPDF = async ({
                     });
                 }
                 
-                
-                
-                
-                
-                
-                
             } catch (drawError) {
                 console.error(
                     `Error drawing shape '${icon.shape}' at index ${index}:`,
