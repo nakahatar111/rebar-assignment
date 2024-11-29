@@ -24,6 +24,8 @@ const DraggableIconsLayer = ({
     editInputs,
     droppedIcons,
     setDroppedIcons, 
+    isPermitted
+
 }: {
     zoomLevel: number;
     currentPage: number;
@@ -36,6 +38,7 @@ const DraggableIconsLayer = ({
     editInputs: { name: string; category: string };
     droppedIcons: DroppedIcon[];
     setDroppedIcons: Dispatch<SetStateAction<DroppedIcon[]>>;
+    isPermitted: boolean;
 }) => {
     const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
@@ -103,6 +106,10 @@ const DraggableIconsLayer = ({
     
     
     const handleDragStart = (e: DragEvent, id: number) => {
+        if(!isPermitted){
+            console.log("Not permitted");
+            return
+        }
         e.stopPropagation();
         setDraggingIndex(id); 
         const draggedIcon = droppedIcons.find(icon => icon.id === id);
@@ -226,7 +233,6 @@ const DraggableIconsLayer = ({
                                 ? "0px 4px 6px rgba(0, 0, 0, 0.7)"
                                 : "none",                     
                         }}
-                        draggable
                         onClick={() => toggleSelectIcon(icon.id)} 
                         onDragStart={(e) => handleDragStart(e, icon.id)}
                         onMouseEnter={(e) => {

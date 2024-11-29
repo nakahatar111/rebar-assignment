@@ -8,6 +8,7 @@ type PDFFile = {
     id: string;
     name: string;
     url: string;
+    permissionList: string[]; // Add permission entry here
 };
 
 type Organization = {
@@ -33,6 +34,7 @@ const PDFUploadPage = () => {
     const [personalFiles, setPersonalFiles] = useState<PDFFile[]>([]);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [selectedOrgId, setSelectedOrgId] = useState<string | null>("");
+    const [userPermissions, setUserPermissions] = useState<Record<string, string>>({});
     const [newOrgName, setNewOrgName] = useState("");
     const router = useRouter();
 
@@ -71,6 +73,7 @@ const PDFUploadPage = () => {
                 id: project.id,
                 name: project.name,
                 url: `${project.url}`,
+                permissionList: project.permissionList || [],
             }));
             console.log(personal_files);
             setPersonalFiles(personal_files);
@@ -84,6 +87,7 @@ const PDFUploadPage = () => {
                         id: project.id,
                         name: project.name,
                         url: `${project.url}`,
+                        permissionList: project.permissionList || [],
                     })),
                 };
             });
@@ -113,14 +117,12 @@ const PDFUploadPage = () => {
             for (const file of files) {
                 // Convert file to base64
                 const fileBase64 = await convertFileToBase64(file);
-                console.log("Userid:", userId);
-                console.log("org id:", selectedOrgId);
-                console.log("chosen:", selectedOrgId !== "" ? selectedOrgId : userId);
 
                 // Construct JSON request body
                 const body = JSON.stringify({
                     action: "uploadPDF",
-                    userId: selectedOrgId !== "" ? selectedOrgId : userId,
+                    account: selectedOrgId !== "" ? selectedOrgId : userId,
+                    userId: userId,
                     pdfName: file.name,
                     pdf: fileBase64,
                 });
@@ -147,6 +149,7 @@ const PDFUploadPage = () => {
                     id: data.id,
                     name: file.name,
                     url: data.pdfUrl,
+                    permissionList: data.permissionList || [],
                 };
     
                 if (selectedOrgId) {
@@ -177,9 +180,52 @@ const PDFUploadPage = () => {
     };
 
     // Select a PDF to view
-    const handlePDFSelect = (url: string, projectId: string) => {
-        router.push(`/pdf-viewer?pdfUrl=${encodeURIComponent(url)}&projectId=${encodeURIComponent(projectId)}`);
+    const handlePDFSelect = (url: string, projectId: string, permissionList: string[]) => {
+        const permissionListString = permissionList.join(","); // Convert the array to a comma-separated string
+        router.push(`/pdf-viewer?pdfUrl=${encodeURIComponent(url)}&projectId=${encodeURIComponent(projectId)}&permissionList=${encodeURIComponent(permissionListString)}`);
     };
+
+    const handleInputChange = (projectID: string, value: string) => {
+        setUserPermissions((prev) => ({
+          ...prev,
+          [projectID]: value,
+        }));
+      };
+    
+      const handleAddPermission = async (projectID: string) => {
+        const newUsername = userPermissions[projectID];
+        if (!newUsername) {
+            alert("Please enter a username before adding permission.");
+            return;
+        }
+    
+        try {
+            const response = await fetch("https://nrkqvh55re.execute-api.us-east-1.amazonaws.com/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    action: "addPermission",
+                    projectID,
+                    username: newUsername,
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to add permission.");
+            }
+    
+            const data = await response.json();
+            console.log("Permission added successfully:", data);
+    
+            alert(`Permission added successfully for project`);
+        } catch (error) {
+            console.error("Error adding permission:", error);
+            alert("Error adding permission. Please try again.");
+        }
+    };
+    
     
 
     // Create a new organization
@@ -321,7 +367,7 @@ const PDFUploadPage = () => {
                     borderBottom: "#999999 solid 1px",
                     cursor: "pointer",
                     }}
-                    onClick={() => handlePDFSelect(file.url, file.id)}
+                    onClick={() => handlePDFSelect(file.url, file.id, file.permissionList)}
                 >
                     {file.name}
                 </div>
@@ -370,7 +416,7 @@ const PDFUploadPage = () => {
                 >
                     Create/Join
                 </button>
-                </div>
+            </div>
 
                 {organizations.map((org) => (
                   <div key={org.id}>
@@ -385,9 +431,39 @@ const PDFUploadPage = () => {
                             borderBottom: "#999999 solid 1px",
                             cursor: "pointer",
                           }}
-                          onClick={() => handlePDFSelect(file.url, file.id)}
                         >
-                          {file.name}
+                          <div
+                            onClick={() => handlePDFSelect(file.url, file.id, file.permissionList)}
+                            >{file.name}</div>
+                          <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+                            <input
+                                type="text"
+                                placeholder="Enter Email"
+                                value={userPermissions[file.id] || ""}
+                                onChange={(e) => handleInputChange(file.id, e.target.value)}
+                                style={{
+                                    flex: "1", 
+                                    padding: "6px",
+                                    paddingLeft: "10px",
+                                    borderRadius: "10px",
+                                    border: "1px solid #ddd",
+                                }}
+                            />
+                            <button
+                                onClick={() => handleAddPermission(file.id)}
+                                style={{
+                                padding: "8px 20px", 
+                                borderRadius: "10px",
+                                border: "1px solid #379EA9",
+                                backgroundColor: "transparent",
+                                color: "#379EA9",
+                                cursor: "pointer",
+                                flexShrink: 0,
+                                }}
+                            >
+                                Attach Edit Permission
+                            </button>
+                            </div>
                         </div>
                       ))
                     ) : (

@@ -16,9 +16,10 @@ type DroppedIcon = {
 interface InventoryListProps {
     droppedIcons: DroppedIcon[]; 
     setDroppedIcons: Dispatch<SetStateAction<DroppedIcon[]>>; 
+    isPermitted: boolean;
 }
 
-const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }) => {
+const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons, isPermitted }) => {
     // Group icons by name and category
     const groupedIcons = droppedIcons.reduce((acc: Record<string, { count: number; category: string; shape: string; color: string }>, icon) => {
         const key = `${icon.name}-${icon.category}`;
@@ -65,7 +66,7 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
                         <th style={{ borderBottom: "2px solid #444", padding: "5px" }}>Name</th>
                         <th style={{ borderBottom: "2px solid #444", padding: "5px" }}>Category</th>
                         <th style={{ borderBottom: "2px solid #444", padding: "5px" }}>Count</th>
-                        <th style={{ borderBottom: "2px solid #444", padding: "5px" }}>Actions</th>
+                        {isPermitted && <th style={{ borderBottom: "2px solid #444", padding: "5px" }}>Actions</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -92,7 +93,7 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
                                 <td style={{ padding: "5px", borderBottom: "1px solid #ddd"}}>
                                     {item.count}
                                 </td>
-                                <td style={{ padding: "5px", borderBottom: "1px solid #ddd"}}>
+                                {isPermitted && <td style={{ padding: "5px", borderBottom: "1px solid #ddd"}}>
                                     <button
                                         onClick={() => handleRemoveItem(item.name, item.category)}
                                         style={{
@@ -107,7 +108,7 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
                                     >
                                         Remove
                                     </button>
-                                </td>
+                                </td>}
                             </tr>
                         ))
                     ) : (

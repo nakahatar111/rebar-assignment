@@ -4,6 +4,8 @@ import { useRef, useEffect, useState, MouseEvent } from "react";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
+
 const ToolChest = dynamic(() => import("./ToolChest"), { ssr: false });
 const DraggableIconsLayer = dynamic(() => import("./DraggableIconsLayer"), { ssr: false });
 const InventoryList = dynamic(() => import("./InventoryList"), { ssr: false });
@@ -66,8 +68,41 @@ const PDFViewer = () => {
     const isDragging = useRef(false);
     const startPosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const scrollPosition = useRef<{ left: number; top: number }>({ left: 0, top: 0 });
-    const [toolChestVisible, setToolChestVisible] = useState(true); 
+    const [toolChestVisible, setToolChestVisible] = useState(false); 
     const [showTable, setShowTable] = useState(false);
+
+    const permissionList = searchParams.get("permissionList");
+    const [isPermitted, setIsPermitted] = useState<boolean>(false);
+
+    const checkPermission = async () => {
+        if (!permissionList) {
+            console.warn("No permission list provided.");
+            return;
+        }
+
+        const permissionsArray = permissionList.split(",");
+        
+        
+        await fetchAuthSession({ forceRefresh: true }); 
+        const currentUser = await getCurrentUser();
+        const username = currentUser.signInDetails?.loginId
+        if(!username){
+            console.log("No username available");
+            return;
+        }
+        console.log("permission list:", permissionsArray);
+        console.log("user:", username);
+
+        // Check if the current user is in the permission list
+        const permitted = permissionsArray.includes(username);
+
+        // Update the state
+        setIsPermitted(permitted);
+    };
+
+    useEffect(() => {
+        checkPermission();
+    }, []);
 
     // Fetch project state from the backend
     const fetchProjectState = async () => {
@@ -398,7 +433,7 @@ const PDFViewer = () => {
             </select>
 
             {/* Open Tool */}
-            <button
+            {isPermitted && <button
                 onClick={() => setToolChestVisible(!toolChestVisible)}
                 style={{
                 padding: "5px 15px",
@@ -412,7 +447,7 @@ const PDFViewer = () => {
                 }}
             >
                 Open Tool
-            </button>
+            </button>}
 
             {/* Open Inventory */}
             <button
@@ -485,7 +520,7 @@ const PDFViewer = () => {
             {/* Download */}
             <ExportPDFButton pdfUrl={pdfUrlString} droppedIcons={droppedIcons}/>
             {/* Save */}
-            <button
+            {isPermitted && <button
                 onClick={handleSaveState}
                 style={{
                 padding: "5px 15px",
@@ -499,7 +534,7 @@ const PDFViewer = () => {
                 }}
             >
                 Save
-            </button>
+            </button>}
             </div>
 
             
@@ -551,6 +586,7 @@ const PDFViewer = () => {
                                 editInputs={editInputs} 
                                 droppedIcons={droppedIcons} 
                                 setDroppedIcons={setDroppedIcons} 
+                                isPermitted={isPermitted}
                             />
                         </div>
                     </div>
@@ -559,11 +595,12 @@ const PDFViewer = () => {
                     {showTable && <InventoryList
                         droppedIcons={droppedIcons}
                         setDroppedIcons={setDroppedIcons}
+                        isPermitted={isPermitted}
                         />
                     }
                 </div>
                 {/* Tool Chest */}
-                {toolChestVisible && <ToolChest
+                {isPermitted && toolChestVisible && <ToolChest
                     setDeleteTrigger={setDeleteTrigger} 
                     iconSize={iconSize}
                     setIconSize={setIconSize}
