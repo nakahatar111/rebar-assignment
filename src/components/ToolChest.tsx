@@ -8,7 +8,7 @@ const ToolChest = ({
         iconSize,
         setIconSize,
         setDeleteTrigger,
-        selectedIcons, // Pass selected icons from DraggableIconsLayer
+        selectedIcons, 
         setEditInputs,
         tools,
         setTools,
@@ -18,19 +18,18 @@ const ToolChest = ({
         setDeleteTrigger: (trigger: boolean) => void;
         selectedIcons: { id: number; page: number }[];
         setEditInputs: Dispatch<SetStateAction<{ name: string; category: string }>>;
-        tools: any[]; // Replace `any` with a defined type for better safety
-        setTools: Dispatch<SetStateAction<any[]>>; // Replace `any[]` with the defined type
+        tools: any[]; 
+        setTools: Dispatch<SetStateAction<any[]>>;
     }) => {
-    // move this to pdfviewer
     const [newTool, setNewTool] = useState({
         name: "",
         category: "",
         color: "#FF2400",
-        shape: "square", // Default shape
+        shape: "square",
     });
-    const [addToolVisible, setaddToolVisible] = useState(true); // Track Tool Chest visibility
-    const [showEditPopup, setShowEditPopup] = useState(false); // Edit popup visibility
-    const [localEditInputs, setLocalEditInputs] = useState({ name: "", category: "" }); // Temporary state
+    const [addToolVisible, setaddToolVisible] = useState(true); 
+    const [showEditPopup, setShowEditPopup] = useState(false);
+    const [localEditInputs, setLocalEditInputs] = useState({ name: "", category: "" }); 
 
     const handleEditConfirm = () => {
         if (!localEditInputs.name && !localEditInputs.category) {
@@ -38,7 +37,7 @@ const ToolChest = ({
             return;
         }
         setEditInputs(localEditInputs);
-        setLocalEditInputs({ name: "", category: "" }); // Clear local state
+        setLocalEditInputs({ name: "", category: "" });
     };
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -71,9 +70,9 @@ const ToolChest = ({
 
     return (
         <div style={{ flex: 0.2, backgroundColor: "#E7E7E7", width: "20%", padding: "10px", transition: "flex 0.3s ease", borderRadius: "30px",
-            display: "flex", // Use flexbox
-            flexDirection: "column", // Stack items vertically
-            height: 'calc(100%-20px)', // Take up the full height of the parent
+            display: "flex",
+            flexDirection: "column",
+            height: 'calc(100%-20px)', 
         }}>
             <h3 style={{ fontFamily: "Arial, sans-serif", textAlign: "center", marginTop:'10px', marginBottom:'10px'}}>Tool Chest</h3>
             
@@ -115,8 +114,8 @@ const ToolChest = ({
                   <div
                     style={{
                       display: "flex",
-                      alignItems: "center", // Vertically center the label and input
-                      gap: "10px", // Space between the label and input
+                      alignItems: "center",
+                      gap: "10px", 
                     }}
                   >
                     <label
@@ -139,7 +138,7 @@ const ToolChest = ({
                         setLocalEditInputs({ ...localEditInputs, name: e.target.value })
                       }
                       style={{
-                        flex: 1, // Takes up the remaining space
+                        flex: 1, 
                         padding: "5px",
                         borderRadius: "20px",
                         border: "1px solid #ddd",
@@ -370,8 +369,8 @@ const ToolChest = ({
                 <div
                     style={{
                         display: "flex",
-                        alignItems: "center", // Aligns the left and right sections vertically
-                        justifyContent: "space-between", // Distributes "Available Tools" and the slider section
+                        alignItems: "center",
+                        justifyContent: "space-between", 
                         margin: "6px 0",
                     }}
                     >
@@ -390,9 +389,9 @@ const ToolChest = ({
                     <div
                         style={{
                         display: "flex",
-                        flexDirection: "column", // Stacks the text and slider vertically
-                        alignItems: "center", // Centers both text and slider horizontally
-                        width: "50%", // Adjust the width of the right section
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "50%",
                         }}
                     >
                         <label
@@ -400,7 +399,7 @@ const ToolChest = ({
                         style={{
                             fontFamily: "Arial, sans-serif",
                             fontSize: "14px",
-                            marginBottom: "0px", // Adds space between text and slider
+                            marginBottom: "0px", 
                         }}
                         >
                         Icon Size: {iconSize}px
@@ -413,9 +412,9 @@ const ToolChest = ({
                         value={iconSize}
                         onChange={(e) => setIconSize(Number(e.target.value))}
                         style={{
-                            width: "100%", // Makes the slider stretch to fit the container
+                            width: "100%", 
                             cursor: "pointer",
-                            accentColor: "#569AFF", // Matches the color of the design
+                            accentColor: "#569AFF", 
                         }}
                         />
                     </div>
@@ -427,13 +426,12 @@ const ToolChest = ({
                 ) : (
                     <div
                         style={{
-                            borderCollapse: "collapse", // Ensures borders collapse like in a traditional table
-                            width: "100%", // Full width
-                            tableLayout: "fixed", // Distribute space evenly for all columns
-                            // height: "100%", // Default height when "Add Tool" is hidden
-                            overflowY: "auto", // Enable vertical scrolling
-                            border: "1px solid #ccc", // Table border
-                            backgroundColor: "#f9f9f9", // Light background
+                            borderCollapse: "collapse",
+                            width: "100%",
+                            tableLayout: "fixed", 
+                            overflowY: "auto", 
+                            border: "1px solid #ccc",
+                            backgroundColor: "#f9f9f9", 
                         }}
                     >
             {/* Header Row */}
@@ -441,8 +439,8 @@ const ToolChest = ({
                 style={{
                     display: "table-row",
                     fontWeight: "bold",
-                    backgroundColor: "#eaeaea", // Light gray header background
-                    borderBottom: "2px solid #ccc", // Bottom border for the header
+                    backgroundColor: "#eaeaea", 
+                    borderBottom: "2px solid #ccc", 
                 }}
             >
                 <div
@@ -451,7 +449,7 @@ const ToolChest = ({
                         textAlign: "center",
                         padding: "5px 10px",
                         border: "1px solid #ccc",
-                        width: "10%", // Fixed width for the icon column
+                        width: "10%", 
                         fontFamily: 'Arial, sans-serif'
                     }}
                 >
@@ -492,23 +490,22 @@ const ToolChest = ({
                             border: "1px solid #ccc",
                             fontFamily: 'Arial, sans-serif'
                         }}
-                        draggable // Enable dragging
+                        draggable 
                         onDragStart={(e) => {
                             e.dataTransfer.setData(
                                 "tool",
-                                JSON.stringify({ ...tool, id: index, size: iconSize }) // Pass tool info as drag data
+                                JSON.stringify({ ...tool, id: index, size: iconSize }) 
                             );
                         
-                            // Create a custom drag image using an SVG element
+                            // Create SVG element
                             const svgNamespace = "http://www.w3.org/2000/svg";
                             const svg = document.createElementNS(svgNamespace, "svg");
                             svg.setAttribute("width", "40");
                             svg.setAttribute("height", "40");
                             svg.setAttribute("xmlns", svgNamespace);
-                            svg.style.position = "absolute"; // Ensure it's not visible as a floating element
-                            svg.style.top = "-1000px"; // Move it far off-screen
+                            svg.style.position = "absolute";
+                            svg.style.top = "-1000px"; 
                         
-                            // Create the shape based on the tool's shape
                             const shape = document.createElementNS(svgNamespace, "path");
                             shape.setAttribute(
                                 "d",
@@ -524,9 +521,9 @@ const ToolChest = ({
                             shape.setAttribute("opacity", "0.5");
                             svg.appendChild(shape);
                         
-                            document.body.appendChild(svg); // Temporarily add the SVG to the DOM
-                            e.dataTransfer.setDragImage(svg, 20, 20); // Center the drag image
-                            setTimeout(() => document.body.removeChild(svg), 0); // Clean up immediately
+                            document.body.appendChild(svg); 
+                            e.dataTransfer.setDragImage(svg, 20, 20);
+                            setTimeout(() => document.body.removeChild(svg), 0);
                         }}
                         
                     >
@@ -544,7 +541,7 @@ const ToolChest = ({
                                     width: '20px',
                                     height: '20px',
                                     backgroundColor: tool.color,
-                                    opacity: 0.5, // See-through effect
+                                    opacity: 0.5, 
                                     clipPath: getClipPath(tool.shape),
                                 }}
                             ></span>
@@ -579,13 +576,12 @@ const ToolChest = ({
     );
 };
 
-// Function to return CSS clip-paths for predefined shapes
 const getClipPath = (shape: string): string => {
     switch (shape) {
         case "circle":
             return "circle(50% at 50% 50%)";
         case "square":
-            return "none"; // Default square
+            return "none";
         case "diamond":
             return "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)";
         case "checkmark":

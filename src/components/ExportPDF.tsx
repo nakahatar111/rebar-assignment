@@ -16,7 +16,6 @@ export const exportPDF = async ({
     droppedIcons: any[];
 }) => {
     try {
-        // Fetch and load the original PDF
         const existingPdfBytes = await fetch(pdfUrl).then((res) => res.arrayBuffer());
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
 
@@ -24,16 +23,15 @@ export const exportPDF = async ({
         droppedIcons.forEach((icon, index) => {
             console.log(`Icon at index ${index}:`, icon);
 
-            // Validate the icon structure
             if (!icon || !icon.page || !icon.color || !icon.shape || !icon.size) {
                 console.error(`Invalid icon at index ${index}:`, icon);
-                return; // Skip this icon
+                return;
             }
 
             const page = pdfDoc.getPage(icon.page - 1);
             if (!page) {
                 console.error(`Page ${icon.page} does not exist in the PDF.`);
-                return; // Skip this icon
+                return; 
             }
 
             console.log("Page retrieved successfully:", page);
@@ -73,10 +71,10 @@ export const exportPDF = async ({
                         height: icon.size / 1.5,
                         color: overlayColor,
                         opacity: 0.5,
-                        rotate: degrees(45), // Rotate by 45 degrees
+                        rotate: degrees(45),
                     });
                 } else if (icon.shape === "checkmark") {
-                    const scaleFactor = icon.size / 100; // Base scaling factor
+                    const scaleFactor = icon.size / 100; 
                     const checkmarkPath = `
                         M ${scaleFactor * 100} ${scaleFactor * 31} 
                         L ${scaleFactor * 43} ${scaleFactor * 100} 

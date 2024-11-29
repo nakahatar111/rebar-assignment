@@ -10,5 +10,5 @@ export default function Home() {
     router.push('/login');
   }, [router]);
 
-  return null; // No UI needed as we are redirecting
+  return null;
 }

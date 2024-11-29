@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth"; // Correct import for getCurrentUser
+import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 import dynamic from "next/dynamic";
 
 const PDFUploadPage = dynamic(() => import("@/components/PDFUploadPage"), { ssr: false });
@@ -15,13 +15,13 @@ const UploadPage = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        await fetchAuthSession({ forceRefresh: true }); // try to refresh the session first
+        // try to refresh the session first
+        await fetchAuthSession({ forceRefresh: true }); 
         // Check if the user is authenticated
         await getCurrentUser();
         setLoading(false);
       } catch (error) {
         console.error("User not authenticated:", error);
-        // Redirect to the sign-up page if not logged in
         router.push("/login");
       } 
     };

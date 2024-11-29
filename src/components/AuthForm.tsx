@@ -9,8 +9,8 @@ import { useRouter } from 'next/navigation';
 Amplify.configure(awsconfig);
 
 export default function AuthForm() {
-  const router = useRouter(); // Initialize the router for redirection
-  const [username, setUsername] = useState<string>(''); // For email or username
+  const router = useRouter();
+  const [username, setUsername] = useState<string>(''); 
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -19,15 +19,16 @@ export default function AuthForm() {
   useEffect(() => {
     const checkCurrentUser = async () => {
       try {
-        await fetchAuthSession({ forceRefresh: true }); // try to refresh the session first
+        // try to refresh the session first
+        await fetchAuthSession({ forceRefresh: true }); 
         // Check if the user is authenticated
         const currentUser = await getCurrentUser();
         if (currentUser) {
           console.log("User already signed in:", currentUser);
-          router.push("/upload"); // Redirect if the user is signed in
+          router.push("/upload");
         }
       } catch (err) {
-        console.log("No signed-in user:", err); // No action needed if not signed in
+        console.log("No signed-in user:", err);
       }
     };
 
@@ -43,7 +44,7 @@ export default function AuthForm() {
         },
         body: JSON.stringify({
           action: 'createUser',
-          username, // User's email or username
+          username, 
         }),
       });
       if (!response.ok) {
@@ -68,7 +69,7 @@ export default function AuthForm() {
     setSuccessMessage(null);
 
     const signUpInput: SignUpInput = {
-      username, // Use "username" for email or username as the identifier
+      username, 
       password,
     };
 

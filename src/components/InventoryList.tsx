@@ -14,8 +14,8 @@ type DroppedIcon = {
 
 
 interface InventoryListProps {
-    droppedIcons: DroppedIcon[]; // Array of dropped icons
-    setDroppedIcons: Dispatch<SetStateAction<DroppedIcon[]>>; // Setter for dropped icons
+    droppedIcons: DroppedIcon[]; 
+    setDroppedIcons: Dispatch<SetStateAction<DroppedIcon[]>>; 
 }
 
 const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }) => {
@@ -47,12 +47,12 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
     return (
         <div
             style={{
-                flex: 0.4, // Reserve 20% height for the table
+                flex: 0.4,
                 backgroundColor: "#F1F1F1",
                 overflow: "auto",
                 padding: "10px",
                 boxSizing: "border-box",
-                transition: "flex 0.3s ease", // Smooth resizing
+                transition: "flex 0.3s ease",
                 height: "100%",
                 width: "100%",
             }}
@@ -73,15 +73,13 @@ const InventoryList: FC<InventoryListProps> = ({ droppedIcons, setDroppedIcons }
                         inventory.map((item, index) => (
                             <tr key={`${item.name}-${item.category}-${index}`}>
                                 <td style={{ padding: "5px", borderBottom: "1px solid #ddd"}}>
-                                    {/* Render the icon visually */}
                                     <div
                                         style={{
                                             width: "20px",
                                             height: "20px",
                                             backgroundColor: item.color,
                                             opacity: 0.5,
-                                            clipPath: getClipPath(item.shape), // Shape-specific clip path
-                                            // borderRadius: item.shape === "circle" ? "50%" : "0",
+                                            clipPath: getClipPath(item.shape), 
                                         }}
                                     />
                                 </td>

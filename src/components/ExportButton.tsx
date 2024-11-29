@@ -8,16 +8,16 @@ const ExportPDFButton = ({
     pdfUrl: string;
     droppedIcons: any[];
 }) => {
-    const [isDownloading, setIsDownloading] = useState(false); // Track download state
+    const [isDownloading, setIsDownloading] = useState(false); 
 
     const handleExport = async () => {
-        setIsDownloading(true); // Set downloading state to true
+        setIsDownloading(true);
         try {
             await exportPDF({ pdfUrl, droppedIcons });
         } catch (error) {
             console.error("Error exporting PDF:", error);
         } finally {
-            setIsDownloading(false); // Reset downloading state
+            setIsDownloading(false); 
         }
     };
 

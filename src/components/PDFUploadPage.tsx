@@ -7,11 +7,11 @@ import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 type PDFFile = {
     id: string;
     name: string;
-    url: string; // Local or remote URL
+    url: string;
 };
 
 type Organization = {
-    id: string; // Unique ID (for eventual backend use)
+    id: string;
     name: string;
     pdfs: PDFFile[];
 };
@@ -19,13 +19,12 @@ type Organization = {
 
 const getUserId = async () => {
     try {
-        await fetchAuthSession({ forceRefresh: true }); // try to refresh the session first
-        // Check if the user is authenticated
+        await fetchAuthSession({ forceRefresh: true }); 
         const user = await getCurrentUser();
-        return user.signInDetails?.loginId; // Cognito `sub` is the unique user ID
+        return user.signInDetails?.loginId; 
     } catch (error) {
         console.error("Error getting user ID:", error);
-        return null; // Handle error if user is not signed in
+        return null;
     }
 };
 
@@ -39,7 +38,7 @@ const PDFUploadPage = () => {
 
     const fetchOrganizationsAndProjects = async () => {
         try {
-            const userId = await getUserId(); // Get the logged-in user's ID
+            const userId = await getUserId(); 
             if (!userId) {
                 alert("User is not authenticated. Please log in.");
                 return;
@@ -64,11 +63,8 @@ const PDFUploadPage = () => {
             const data = await response.json();
             console.log("Organizations and Projects loaded:", data);
     
-            // Extract organizations
             const userOrganizations = data.userOrganizations || [];
-    
-            // Extract personal project list
-            const personalProjects = data.personalFiles || []; // Assuming backend returns personal projects
+            const personalProjects = data.personalFiles || [];
     
             // Set personal files
             const personal_files: PDFFile[] = personalProjects.map((project: any) => ({
@@ -103,7 +99,6 @@ const PDFUploadPage = () => {
     }, []);
 
 
-    // Handle file uploads for personal files or selected organization
     const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
@@ -151,7 +146,7 @@ const PDFUploadPage = () => {
                 const uploadedFile: PDFFile = {
                     id: data.id,
                     name: file.name,
-                    url: data.pdfUrl, // Use the S3 pre-signed URL
+                    url: data.pdfUrl,
                 };
     
                 if (selectedOrgId) {
@@ -171,7 +166,7 @@ const PDFUploadPage = () => {
         }
     };
     
-    // Helper function to convert file to base64
+    // convert file to base64
     const convertFileToBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -195,7 +190,7 @@ const PDFUploadPage = () => {
         }
     
         try {
-            const userId = await getUserId(); // Get the logged-in user's ID
+            const userId = await getUserId();
             console.log(userId);
             if (!userId) {
                 alert("User is not authenticated. Please log in.");
@@ -221,13 +216,12 @@ const PDFUploadPage = () => {
             console.log("Organization Response:", data);
     
             if (data.userOrganizations) {
-                // Set all organizations the user is part of into the local state
                 const orgList = data.userOrganizations.map((org: any) => ({
-                    id: org.id, // Use the organization name as the ID for now
+                    id: org.id, 
                     name: org.name,
                     pdfs: org.pdfs || [],
                 }));
-                setOrganizations(orgList); // Update the organizations state with the list
+                setOrganizations(orgList); 
             }
     
             setNewOrgName("");
@@ -312,8 +306,8 @@ const PDFUploadPage = () => {
                 borderRadius: "10px",
                 padding: "20px",
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                maxHeight: "400px", // Set the maximum height
-                overflowY: "auto", // Enable scrolling when content exceeds max height
+                maxHeight: "400px", 
+                overflowY: "auto",
             }}
             >
             <h2 style={{ fontSize: "20px", marginBottom: "10px" }}>Personal Files</h2>
@@ -344,8 +338,8 @@ const PDFUploadPage = () => {
                   borderRadius: "10px",
                   padding: "20px",
                   boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                  maxHeight: "400px", // Set maximum height
-                  overflowY: "auto", // Enable scrolling when content exceeds max height
+                  maxHeight: "400px", 
+                  overflowY: "auto", 
                 }}
               >
             <h2 style={{ fontSize: "20px", marginBottom: "10px" }}>Organization</h2>
@@ -356,7 +350,7 @@ const PDFUploadPage = () => {
                     value={newOrgName}
                     onChange={(e) => setNewOrgName(e.target.value)}
                     style={{
-                    flex: "1", // Allow the input to take the remaining space
+                    flex: "1", 
                     padding: "10px",
                     borderRadius: "10px",
                     border: "1px solid #ddd",
@@ -365,13 +359,13 @@ const PDFUploadPage = () => {
                 <button
                     onClick={handleCreateOrganization}
                     style={{
-                    padding: "10px 20px", // Adjust padding for better button size
+                    padding: "10px 20px", 
                     borderRadius: "10px",
                     border: "1px solid #379EA9",
                     backgroundColor: "#379EA9",
                     color: "#fff",
                     cursor: "pointer",
-                    flexShrink: 0, // Prevent the button from shrinking
+                    flexShrink: 0,
                     }}
                 >
                     Create/Join

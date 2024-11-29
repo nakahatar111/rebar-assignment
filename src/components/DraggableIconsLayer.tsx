@@ -22,8 +22,8 @@ const DraggableIconsLayer = ({
     selectedIcons,
     setSelectedIcons,
     editInputs,
-    droppedIcons, // Access dropped icons from parent
-    setDroppedIcons, // Update dropped icons in parent
+    droppedIcons,
+    setDroppedIcons, 
 }: {
     zoomLevel: number;
     currentPage: number;
@@ -37,14 +37,13 @@ const DraggableIconsLayer = ({
     droppedIcons: DroppedIcon[];
     setDroppedIcons: Dispatch<SetStateAction<DroppedIcon[]>>;
 }) => {
-    // const [droppedIcons, setDroppedIcons] = useState<any[]>([]);
-    const [draggingIndex, setDraggingIndex] = useState<number | null>(null); // Track the index of the dragging icon
+    const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
     const [tooltip, setTooltip] = useState<{
         visible: boolean;
         x: number;
         y: number;
-        content: ReactNode; // Allow React elements
+        content: ReactNode;
     }>({
         visible: false,
         x: 0,
@@ -61,8 +60,8 @@ const DraggableIconsLayer = ({
                         !selectedIcons.some((selected) => selected.id === icon.id && selected.page === currentPage)
                 )
             );
-            setSelectedIcons([]); // Reset selection
-            resetDeleteTrigger(); // Reset delete trigger
+            setSelectedIcons([]); 
+            resetDeleteTrigger();
         }
     }, [deleteTrigger, selectedIcons, resetDeleteTrigger, currentPage]);
     
@@ -70,23 +69,21 @@ const DraggableIconsLayer = ({
 
 
     const handleDrop = (e: DragEvent) => {
-        e.preventDefault(); // Allow drop
-        e.stopPropagation(); // Prevent the event from propagating to the PDF viewer
+        e.preventDefault();
+        e.stopPropagation();
     
         if (!containerRef.current) return;
     
         const rect = containerRef.current.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / zoomLevel; // Compute x-coordinate
+        const x = (e.clientX - rect.left) / zoomLevel;
         const y = (e.clientY - rect.top) / zoomLevel;
     
         if (draggingIndex !== null) {
-            // Rearrange existing icon
             setDroppedIcons((prev) =>
                 prev.map((icon) => icon.id === draggingIndex ? { ...icon, x, y } : icon)
             );
-            setDraggingIndex(null); // Reset dragging index
+            setDraggingIndex(null);
         } else {
-            // Drop new icon from ToolChest
             const toolData = JSON.parse(e.dataTransfer.getData("tool"));
     
             // Add the new icon with a unique id
@@ -107,23 +104,22 @@ const DraggableIconsLayer = ({
     
     const handleDragStart = (e: DragEvent, id: number) => {
         e.stopPropagation();
-        setDraggingIndex(id); // Store the index of the dragging icon
+        setDraggingIndex(id); 
         const draggedIcon = droppedIcons.find(icon => icon.id === id);
         if(!draggedIcon){
             console.log("undefined icon");
             return
         }
 
-        // Create a custom drag image using an SVG element
+        // Create custom SVG element
         const svgNamespace = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(svgNamespace, "svg");
         svg.setAttribute("width", "40");
         svg.setAttribute("height", "40");
         svg.setAttribute("xmlns", svgNamespace);
-        svg.style.position = "absolute"; // Ensure it's not visible as a floating element
-        svg.style.top = "-1000px"; // Move it far off-screen
+        svg.style.position = "absolute";
+        svg.style.top = "-1000px";
     
-        // Create the shape based on the icon's shape
         const shape = document.createElementNS(svgNamespace, "path");
         shape.setAttribute(
             "d",
@@ -139,9 +135,9 @@ const DraggableIconsLayer = ({
         shape.setAttribute("opacity", "0.5");
         svg.appendChild(shape);
     
-        document.body.appendChild(svg); // Temporarily add the SVG to the DOM
-        e.dataTransfer.setDragImage(svg, 20, 20); // Center the drag image
-        setTimeout(() => document.body.removeChild(svg), 0); // Clean up immediately
+        document.body.appendChild(svg);
+        e.dataTransfer.setDragImage(svg, 20, 20);
+        setTimeout(() => document.body.removeChild(svg), 0);
     };
     
 
@@ -169,9 +165,8 @@ const DraggableIconsLayer = ({
         );
     };
     
-    
+    // Update sizes of selected icons
     useEffect(() => {
-        // Update sizes of selected icons whenever iconSize changes
         if (selectedIcons.length > 0) {
             updateSelectedIconSizes(iconSize);
         }
@@ -193,8 +188,9 @@ const DraggableIconsLayer = ({
         );
     };
 
+
+    // Update icons when edit is triggered
     useEffect(() => {
-        // Update icons when edit is triggered
         if (editInputs.name || editInputs.category) {
             handleEditSelectedIcons();
         }
@@ -217,31 +213,28 @@ const DraggableIconsLayer = ({
                             top: icon.y * zoomLevel,
                             width: icon.size * zoomLevel,
                             height: icon.size * zoomLevel,
-                            // backgroundColor: icon.color,
-                            backgroundColor: "transparent", // Ensure the background is transparent
-                            // opacity: 0.5,
-                            // clipPath: getClipPath(icon.shape),
-                            transform: `translate(-50%, -50%)`, // Center the icon at the drop point
-                            cursor: "pointer", // Indicate draggable element
+                            backgroundColor: "transparent", 
+                            transform: `translate(-50%, -50%)`, 
+                            cursor: "pointer",
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
                             border: selectedIcons.some((selected) => selected.id === icon.id && selected.page === currentPage)
-                            ? "1px solid blue" // Highlight selected icons
+                            ? "1px solid blue" 
                             : "none",
                             boxShadow: selectedIcons.some((selected) => selected.id === icon.id && selected.page === currentPage)
                                 ? "0px 4px 6px rgba(0, 0, 0, 0.7)"
                                 : "none",                     
                         }}
                         draggable
-                        onClick={() => toggleSelectIcon(icon.id)} // Toggle selection
+                        onClick={() => toggleSelectIcon(icon.id)} 
                         onDragStart={(e) => handleDragStart(e, icon.id)}
                         onMouseEnter={(e) => {
                             const rect = e.currentTarget.getBoundingClientRect();
                             setTooltip({
                                 visible: true,
-                                x: rect.right + 10, // Position slightly to the right of the icon
-                                y: rect.top + rect.height / 2, // Vertically center it relative to the icon
+                                x: rect.right + 10, 
+                                y: rect.top + rect.height / 2, 
                                 content: (
                                     <div>
                                         <span style={{ fontWeight: "bold" }}>{icon.category}</span>
@@ -257,9 +250,9 @@ const DraggableIconsLayer = ({
                             style={{
                                 width: "100%",
                                 height: "100%",
-                                backgroundColor: icon.color, // Icon color
-                                clipPath: getClipPath(icon.shape), // Shape-specific clip path
-                                opacity: 0.5, // Icon transparency
+                                backgroundColor: icon.color, 
+                                clipPath: getClipPath(icon.shape), 
+                                opacity: 0.5, 
                             }}
                             draggable
                         ></div>
@@ -271,13 +264,13 @@ const DraggableIconsLayer = ({
                         position: "fixed",
                         top: tooltip.y,
                         left: tooltip.x,
-                        transform: "translate(0, -50%)", // Center vertically relative to the trigger point
+                        transform: "translate(0, -50%)", 
                         backgroundColor: "#feff9c",
                         color: "black",
                         padding: "5px 10px",
                         borderRadius: "5px",
                         boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                        whiteSpace: "pre-line", // Enable new line for text
+                        whiteSpace: "pre-line", 
                         fontSize: "12px",
                         zIndex: 10,
                     }}
