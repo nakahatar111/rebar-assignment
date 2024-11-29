@@ -8,10 +8,6 @@ const ToolChest = dynamic(() => import("./ToolChest"), { ssr: false });
 const DraggableIconsLayer = dynamic(() => import("./DraggableIconsLayer"), { ssr: false });
 const InventoryList = dynamic(() => import("./InventoryList"), { ssr: false });
 const ExportPDFButton = dynamic(() => import("./ExportButton"), { ssr: false });
-// import ToolChest from "./ToolChest";
-// import DraggableIconsLayer from "./DraggableIconsLayer";
-// import InventoryList from "./InventoryList";
-// import ExportPDFButton from "./ExportButton";
 
 // Lazy load PDF.js to reduce the bundle size
 const loadPdfjs = async () => {
@@ -387,7 +383,7 @@ const PDFViewer = () => {
     
 
     return (
-        <div style={{height: "95%", width: "90vw", border: "blue solid 4px"}}>
+        <div style={{height: "95%", width: "90vw", border: "blue solid 4px", marginLeft:'auto', marginRight:'auto'}}>
             {/* Toolbar for zoom and page selection */}
             <div style={{textAlign: "center", height: "5%", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", }}>
                 <button onClick={() => handleZoomIn()}>

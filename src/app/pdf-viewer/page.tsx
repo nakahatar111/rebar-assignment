@@ -3,7 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "aws-amplify/auth"; // Correct import for getCurrentUser
-import PDFViewer from "../../components/PDFViewer";
+// import PDFViewer from "../../components/PDFViewer";
+import dynamic from "next/dynamic";
+
+const PDFViewer = dynamic(() => import("@/components/PDFViewer"), { ssr: false });
 
 const PDFViewerPage = () => {
   const router = useRouter();
