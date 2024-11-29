@@ -34,6 +34,33 @@ export default function AuthForm() {
     checkCurrentUser();
   }, [router]);
 
+  const createUserEntry = async (username: string) => {
+    try {
+      const response = await fetch("https://nrkqvh55re.execute-api.us-east-1.amazonaws.com/", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'createUser',
+          username, // User's email or username
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create user entry in DynamoDB');
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+  
+      console.log('DynamoDB user entry created successfully');
+    } catch (err) {
+      console.error('Error creating user entry in DynamoDB:', err);
+    }
+  };
+  
+
   // Sign-Up Function
   const handleSignUp = async () => {
 
@@ -47,7 +74,10 @@ export default function AuthForm() {
 
     try {
       const response: SignUpOutput = await signUp(signUpInput);
-      setSuccessMessage('Sign-up successful! Please check your email for verification link');
+      
+      await createUserEntry(username);
+
+      setSuccessMessage('Sign-up successful! Please check your email for the verification link');
       console.log('Sign-up success:', response);
     } catch (err: any) {
       setError(err.message || 'Error during sign-up. Please try again.');

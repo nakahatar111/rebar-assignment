@@ -14,10 +14,38 @@ import InventoryList from "./InventoryList";
 import ExportPDFButton from "./ExportButton";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
+
+type Tool = {
+    category: string;
+    color: string;
+    name: string;
+    shape: string;
+};
+
+// Define the type for a dropped icon (overlay item)
+type DroppedIcon = {
+    category: string;
+    color: string;
+    id: string; // Unique ID for each icon
+    name: string;
+    page: number; // Page number where the icon is placed
+    shape: string;
+    size: number;
+    x: number; // X-coordinate on the page
+    y: number; // Y-coordinate on the page
+};
+
+// Define the state for tools and dropped icons
+type ProjectState = {
+    tools: Tool[];
+    overlay: DroppedIcon[];
+};
+
 const PDFViewer = () => {
     const [pdf, setPdf] = useState<any>(null);
     const searchParams = useSearchParams(); // Call the hook
     const pdfUrl = searchParams.get("pdfUrl"); // Now correctly retrieve "pdfUrl"
+    const projectId = searchParams.get("projectId");
     const [error, setError] = useState<string | null>(null); // Track PDF loading errors
     const [currentPage, setCurrentPage] = useState(1); // Default to the first page
     const [totalPages, setTotalPages] = useState(0);
@@ -30,7 +58,8 @@ const PDFViewer = () => {
     const [deleteTrigger, setDeleteTrigger] = useState(false); // Tracks delete button clicks
     const [selectedIcons, setSelectedIcons] = useState<{ id: number; page: number }[]>([]);
     const [editInputs, setEditInputs] = useState({ name: "", category: "" }); // Edit inputs
-    const [droppedIcons, setDroppedIcons] = useState<any[]>([]); // Manage dropped icons
+    const [droppedIcons, setDroppedIcons] = useState<DroppedIcon[]>([]); // Manage the list of dropped icons
+    const [tools, setTools] = useState<Tool[]>([]); // Manage the list of tools
 
     // Track dragging state
     const isDragging = useRef(false);
@@ -39,10 +68,84 @@ const PDFViewer = () => {
     const [toolChestVisible, setToolChestVisible] = useState(true); // Track Tool Chest visibility
     const [showTable, setShowTable] = useState(false);
 
-    
     useEffect(() => {
-        console.log("selected icons: ", selectedIcons);
-    }, [selectedIcons]);
+        console.log("Tool Chest: ", tools);
+        console.log("Overlay: ", droppedIcons);
+    }, [tools, droppedIcons]);
+
+    // Fetch project state from the backend
+    const fetchProjectState = async () => {
+        if (!projectId) {
+            console.error("Project ID not found.");
+            return;
+        }
+
+        try {
+            const response = await fetch("https://nrkqvh55re.execute-api.us-east-1.amazonaws.com/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    action: "getProjectState",
+                    projectId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch project state.");
+            }
+
+            const data: { tools?: Tool[]; overlay?: DroppedIcon[] } = await response.json();
+            console.log("Fetched Project State:", data);
+
+            // Update the state with fetched data, or leave as is if no data is returned
+            if (data.tools) setTools(data.tools);
+            if (data.overlay) setDroppedIcons(data.overlay);
+        } catch (error) {
+            console.error("Error fetching project state:", error);
+        }
+    };
+
+    // Fetch project state on component mount
+    useEffect(() => {
+        fetchProjectState();
+    }, [projectId]);
+
+
+    const handleSaveState = async () => {
+        if (!projectId) {
+            console.error("Project ID not found.");
+            return;
+        }
+    
+        const stateToSave: ProjectState = { tools, overlay: droppedIcons }; // Use defined types
+        console.log("State Saved:", { tools, overlay: droppedIcons });
+    
+        try {
+            const response = await fetch("https://nrkqvh55re.execute-api.us-east-1.amazonaws.com/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    action: "saveProjectState",
+                    projectId: projectId,
+                    state: stateToSave,
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to save state to the backend.");
+            }
+    
+            const data = await response.json();
+            console.log("State saved to DynamoDB:", data);
+        } catch (error) {
+            console.error("Error saving state to DynamoDB:", error);
+        }
+    };
+    
 
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
@@ -101,7 +204,7 @@ const PDFViewer = () => {
             setError("No PDF URL provided. Please select a valid PDF.");
             return;
         }
-
+        console.log("PDF Link:", pdfUrl);
         const loadPdf = async () => {
             try {
                 const loadedPdf = await pdfjsLib.getDocument(pdfUrl).promise;
@@ -118,20 +221,6 @@ const PDFViewer = () => {
         loadPdf();
     }, [pdfUrl]);
 
-    // useEffect(() => {
-    //     const loadPdf = async () => {
-    //         try {
-    //             const loadedPdf = await pdfjsLib.getDocument("/blueprint.pdf").promise;
-    //             console.log("PDF Loaded", loadedPdf);
-    //             setPdf(loadedPdf);
-    //             setTotalPages(loadedPdf.numPages); // Set the total number of pages
-    //         } catch (error) {
-    //             console.error("Error loading PDF:", error);
-    //         }
-    //     };
-
-    //     loadPdf();
-    // }, []);
 
     // Render the current page with the current zoom level
 
@@ -326,11 +415,11 @@ const PDFViewer = () => {
                     {showTable ? 'Hide Table' : 'Show Table'}
                 </button>
 
-                {/* <ExportPDF
-                    pdfUrl="/blueprint.pdf"
-                    droppedIcons={droppedIcons}
-                /> */}
                 <ExportPDFButton pdfUrl="/blueprint.pdf" droppedIcons={droppedIcons} />
+
+                <button onClick={handleSaveState} style={{ backgroundColor: "#28a745", color: "#fff", cursor: "pointer" }}>
+                    Save State
+                </button>
 
 
             </div>
@@ -401,6 +490,8 @@ const PDFViewer = () => {
                     setIconSize={setIconSize}
                     selectedIcons={selectedIcons} // Pass selected icons
                     setEditInputs={setEditInputs} // Pass edit inputs setter
+                    tools={tools}
+                    setTools={setTools}
                     />
                 }
             </div>
