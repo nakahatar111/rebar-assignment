@@ -149,7 +149,7 @@ const PDFUploadPage = () => {
                     id: data.id,
                     name: file.name,
                     url: data.pdfUrl,
-                    permissionList: data.permissionList || [],
+                    permissionList: data.permission || [],
                 };
     
                 if (selectedOrgId) {
@@ -181,7 +181,7 @@ const PDFUploadPage = () => {
 
     // Select a PDF to view
     const handlePDFSelect = (url: string, projectId: string, permissionList: string[]) => {
-        const permissionListString = permissionList.join(","); // Convert the array to a comma-separated string
+        const permissionListString = permissionList.join(",");
         router.push(`/pdf-viewer?pdfUrl=${encodeURIComponent(url)}&projectId=${encodeURIComponent(projectId)}&permissionList=${encodeURIComponent(permissionListString)}`);
     };
 
