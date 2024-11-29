@@ -3,11 +3,15 @@
 import { useRef, useEffect, useState, MouseEvent } from "react";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useSearchParams } from "next/navigation"; // App Router query parameter handling
-
-import ToolChest from "./ToolChest";
-import DraggableIconsLayer from "./DraggableIconsLayer";
-import InventoryList from "./InventoryList";
-import ExportPDFButton from "./ExportButton";
+import dynamic from "next/dynamic";
+const ToolChest = dynamic(() => import("./ToolChest"), { ssr: false });
+const DraggableIconsLayer = dynamic(() => import("./DraggableIconsLayer"), { ssr: false });
+const InventoryList = dynamic(() => import("./InventoryList"), { ssr: false });
+const ExportPDFButton = dynamic(() => import("./ExportButton"), { ssr: false });
+// import ToolChest from "./ToolChest";
+// import DraggableIconsLayer from "./DraggableIconsLayer";
+// import InventoryList from "./InventoryList";
+// import ExportPDFButton from "./ExportButton";
 
 // Lazy load PDF.js to reduce the bundle size
 const loadPdfjs = async () => {
