@@ -37,6 +37,21 @@ const PDFUploadPage = () => {
     const [userPermissions, setUserPermissions] = useState<Record<string, string>>({});
     const [newOrgName, setNewOrgName] = useState("");
     const router = useRouter();
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchCurrentUserId = async () => {
+            const userId = await getUserId();
+            if (!userId) {
+                alert("User is not authenticated. Please log in.");
+                return;
+            }
+            setCurrentUserId(userId);
+        };
+        fetchCurrentUserId();
+        fetchOrganizationsAndProjects();
+    }, []);
+        
 
     const fetchOrganizationsAndProjects = async () => {
         try {
@@ -97,10 +112,7 @@ const PDFUploadPage = () => {
             console.error("Error fetching organizations and projects:", error);
         }
     };
-    
-    useEffect(() => {
-        fetchOrganizationsAndProjects();
-    }, []);
+
 
 
     const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -192,7 +204,7 @@ const PDFUploadPage = () => {
         }));
       };
     
-      const handleAddPermission = async (projectID: string) => {
+    const handleAddPermission = async (projectID: string) => {
         const newUsername = userPermissions[projectID];
         if (!newUsername) {
             alert("Please enter a username before adding permission.");
@@ -220,6 +232,10 @@ const PDFUploadPage = () => {
             console.log("Permission added successfully:", data);
     
             alert(`Permission added successfully for project`);
+            setUserPermissions((prev) => ({
+                ...prev,
+                [projectID]: "",
+            }));
         } catch (error) {
             console.error("Error adding permission:", error);
             alert("Error adding permission. Please try again.");
@@ -435,7 +451,7 @@ const PDFUploadPage = () => {
                           <div
                             onClick={() => handlePDFSelect(file.url, file.id, file.permissionList)}
                             >{file.name}</div>
-                          <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+                          {currentUserId && file.permissionList.includes(currentUserId) && <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
                             <input
                                 type="text"
                                 placeholder="Enter Email"
@@ -463,7 +479,7 @@ const PDFUploadPage = () => {
                             >
                                 Attach Edit Permission
                             </button>
-                            </div>
+                            </div>}
                         </div>
                       ))
                     ) : (
