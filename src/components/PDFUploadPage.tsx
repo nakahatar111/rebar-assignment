@@ -405,7 +405,7 @@ const PDFUploadPage = () => {
                 }}
               >
             <h2 style={{ fontSize: "20px", marginBottom: "10px" }}>Organization</h2>
-            <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "5px" }}>
                 <input
                     type="text"
                     placeholder="Enter Organization Name"
@@ -421,7 +421,7 @@ const PDFUploadPage = () => {
                 <button
                     onClick={handleCreateOrganization}
                     style={{
-                    padding: "10px 20px", 
+                    padding: "10px 10px", 
                     borderRadius: "10px",
                     border: "1px solid #379EA9",
                     backgroundColor: "#379EA9",
